@@ -121,7 +121,9 @@ public class AfDetailedWidget {
 	private Paint mIconPaint = null;
 
 	/* Wind (AF Wind Widget) */
-	private Paint mWindPaint, mWindStrongPaint, mGustPaint, mGustStrongPaint;
+	private Paint mWindLinkPaint, mWindLinkStrongPaint;
+	private Paint mWindDotPaint, mGustDotPaint, mStrongDotPaint;
+	private float mWindDotRadius;
 	private Paint mWindThresholdPaint, mWindLabelPaint;
 	private boolean mDrawWind;
 	private double mWindScaleMax;
@@ -1286,10 +1288,11 @@ public class AfDetailedWidget {
 		mMaxRainPaint.setStrokeCap(Paint.Cap.SQUARE);
 
 		final int strongColor = mWidgetSettings.getWindStrongColor();
-		mWindPaint = buildLinePaint(mWidgetSettings.getWindColor());
-		mGustPaint = buildLinePaint(mWidgetSettings.getGustColor());
-		mWindStrongPaint = buildLinePaint(strongColor);
-		mGustStrongPaint = buildLinePaint(strongColor);
+		mWindLinkPaint = buildLinePaint(mWidgetSettings.getWindColor());
+		mWindLinkStrongPaint = buildLinePaint(strongColor);
+		mWindDotPaint = buildFillPaint(mWidgetSettings.getWindColor(), true);
+		mGustDotPaint = buildFillPaint(mWidgetSettings.getGustColor(), true);
+		mStrongDotPaint = buildFillPaint(strongColor, true);
 		mWindThresholdPaint = buildLinePaint((strongColor & 0x00FFFFFF) | 0x99000000);
 		mWindThresholdPaint.setStrokeCap(Paint.Cap.BUTT);
 		mWindLabelPaint = buildTextPaint(mWidgetSettings.getTextColor());
@@ -1408,27 +1411,6 @@ public class AfDetailedWidget {
 		return new double[] { Math.ceil(top / step) * step, step };
 	}
 
-	private Path buildWindPath(boolean gusts) {
-		ArrayList<PointF> points = new ArrayList<>();
-		float timeRange = (float) (mTimeTo - mTimeFrom);
-
-		for (PointData p : mPointData) {
-			Float value = gusts ? p.windGust : p.windSpeed;
-			if (p.time == null || value == null) continue;
-			float x = (float) (p.time - mTimeFrom) / timeRange;
-			float y = 1.0f - (float) (Math.max(0.0f, value) / mWindScaleMax);
-			points.add(new PointF(x, y));
-		}
-
-		Path path = CatmullRomSpline.buildPath(points.toArray(new PointF[0]));
-
-		Matrix scaleMatrix = new Matrix();
-		scaleMatrix.setScale(mGraphRect.width(), mGraphRect.height());
-		path.transform(scaleMatrix);
-		path.offset(mGraphRect.left, mGraphRect.top);
-		return path;
-	}
-
 	private float windToY(double value) {
 		return (float) (mGraphRect.bottom - value / mWindScaleMax * mGraphRect.height());
 	}
@@ -1448,22 +1430,45 @@ public class AfDetailedWidget {
 			canvas.drawPath(thresholdPath, mWindThresholdPaint);
 		}
 
-		Path gustPath = buildWindPath(true);
-		Path windPath = buildWindPath(false);
-
-		// Below the threshold: normal colors
 		canvas.save();
-		canvas.clipRect(inner.left, thresholdY, inner.right, inner.bottom);
-		canvas.drawPath(gustPath, mGustPaint);
-		canvas.drawPath(windPath, mWindPaint);
-		canvas.restore();
+		canvas.clipRect(inner);
 
-		// Above the threshold: strong wind color
-		canvas.save();
-		canvas.clipRect(inner.left, inner.top, inner.right, thresholdY);
-		canvas.drawPath(gustPath, mGustStrongPaint);
-		canvas.drawPath(windPath, mWindStrongPaint);
+		// Each value is drawn at the middle of its hour, aligned with the rain bars
+		// (the gust is the strongest of the past hour).
+		final long halfHour = DateUtils.HOUR_IN_MILLIS / 2;
+		final float timeRange = (float) (mTimeTo - mTimeFrom);
+
+		for (PointData p : mPointData) {
+			if (p.time == null || p.windSpeed == null) continue;
+
+			long time = p.time - halfHour;
+			if (time < mTimeFrom || time > mTimeTo) continue;
+
+			float xPos = mGraphRect.left + (time - mTimeFrom) / timeRange * mGraphRect.width();
+			float wind = Math.max(0.0f, p.windSpeed);
+			float yWind = windToY(wind);
+
+			if (p.windGust != null && p.windGust > wind) {
+				float yGust = windToY(p.windGust);
+				drawWindLink(canvas, xPos, yWind, yGust, thresholdY);
+				canvas.drawCircle(xPos, yGust, mWindDotRadius, p.windGust > threshold ? mStrongDotPaint : mGustDotPaint);
+			}
+			canvas.drawCircle(xPos, yWind, mWindDotRadius, wind > threshold ? mStrongDotPaint : mWindDotPaint);
+		}
+
 		canvas.restore();
+	}
+
+	/** Vertical line from the wind dot (below) up to the gust dot, in the strong color above the threshold. */
+	private void drawWindLink(Canvas canvas, float x, float yWind, float yGust, float thresholdY) {
+		if (yGust >= thresholdY) {
+			canvas.drawLine(x, yWind, x, yGust, mWindLinkPaint);
+		} else if (yWind <= thresholdY) {
+			canvas.drawLine(x, yWind, x, yGust, mWindLinkStrongPaint);
+		} else {
+			canvas.drawLine(x, yWind, x, thresholdY, mWindLinkPaint);
+			canvas.drawLine(x, thresholdY, x, yGust, mWindLinkStrongPaint);
+		}
 	}
 
 	private void drawWindLabels(Canvas canvas) {
@@ -1684,15 +1689,11 @@ public class AfDetailedWidget {
         mBelowFreezingTemperaturePaint.setStrokeWidth(2.0f * mDP * scaleFactor);
         mMaxRainPaint.setStrokeWidth(Math.max(1.0f, mDP * scaleFactor));
 
-        // Wind lines are half the thickness of the temperature line
-        float windStroke = Math.max(1.0f, 1.0f * mDP * scaleFactor);
-        mWindPaint.setStrokeWidth(windStroke);
-        mWindStrongPaint.setStrokeWidth(windStroke);
-        mGustPaint.setStrokeWidth(windStroke);
-        mGustStrongPaint.setStrokeWidth(windStroke);
-        DashPathEffect gustDash = new DashPathEffect(new float[] { 4.0f * mDP * scaleFactor, 3.0f * mDP * scaleFactor }, 0.0f);
-        mGustPaint.setPathEffect(gustDash);
-        mGustStrongPaint.setPathEffect(gustDash);
+        // Wind: one dot for the mean wind and one for the gust each hour, linked by a thin line
+        float linkStroke = Math.max(1.0f, 0.75f * mDP * scaleFactor);
+        mWindLinkPaint.setStrokeWidth(linkStroke);
+        mWindLinkStrongPaint.setStrokeWidth(linkStroke);
+        mWindDotRadius = Math.max(1.5f, 1.5f * mDP * scaleFactor);
         mWindThresholdPaint.setStrokeWidth(Math.max(1.0f, 0.75f * mDP * scaleFactor));
         mWindThresholdPaint.setPathEffect(new DashPathEffect(new float[] { 1.5f * mDP * scaleFactor, 3.0f * mDP * scaleFactor }, 0.0f));
         mWindLabelPaint.setTextSize(mLabelTextSize);

@@ -43,8 +43,8 @@
 	<!-- Wind and gusts -->
 	<string name="wind_help_text">Weather data comes from the Météo-France models (AROME, then ARPEGE) through Open-Meteo.\n
 
-    	\n\u2022 The solid line is the mean wind speed, the dashed line is the gust speed, both in km/h with the scale on the right side of the graph.
-    	\n\u2022 Above the strong wind threshold (40 km/h by default), the lines change color and a dotted line marks the threshold.\n
+    	\n\u2022 Each hour, a dot shows the mean wind speed and a second dot the strongest gust, linked by a line. Speeds are in km/h, with the scale on the right side of the graph.
+    	\n\u2022 Above the strong wind threshold (40 km/h by default), dots and lines change color, and a dotted line marks the threshold.\n
 
 		\nThe threshold and the colors can be changed in the appearance settings, under Wind.
 	</string>
@@ -285,7 +285,7 @@
 
 	<string name="ui_settings_category_wind">Wind</string>
 	<string name="wind_enabled_title">Show wind</string>
-	<string name="wind_enabled_summary_on">Wind and gust lines shown</string>
+	<string name="wind_enabled_summary_on">Wind and gusts shown</string>
 	<string name="wind_enabled_summary_off">Wind hidden</string>
 	<string name="wind_threshold_title">Strong wind threshold</string>
 	<string name="wind_threshold_summary">%1$s km/h</string>

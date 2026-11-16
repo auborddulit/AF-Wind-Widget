@@ -7,8 +7,8 @@ Personal fork of [AF Weather Widget](https://github.com/Gitsaibot/AF-Weather-Wid
 ## Changes from the original
 
 - **Weather source**: Open-Meteo with the Météo-France models (`meteofrance_seamless`) — free, no account or key. MET Norway is still available in the settings. The US-only NOAA source was removed.
-- **Wind**: mean wind (solid line) and gusts (dashed line), with a km/h scale on the right side of the graph.
-- **Strong wind threshold**: above the threshold (40 km/h by default) the lines change color, and a dotted line marks the threshold.
+- **Wind**: each hour, a dot for the mean wind and a dot for the strongest gust, linked by a line and aligned with the rain bars, with a km/h scale on the right side of the graph.
+- **Strong wind threshold**: above the threshold (40 km/h by default) the dots and lines change color, and a dotted line marks the threshold.
 - **Top line**: the current wind ("Wind 18 km/h (gust 38)") replaces the sea level pressure (MSLP).
 - **New settings** (Appearance → Wind): show wind, threshold, mean wind color, gust color and above-threshold color.
 - **Location search and time zones**: Open-Meteo instead of GeoNames (no GeoNames account needed).
