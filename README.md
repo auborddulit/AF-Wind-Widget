@@ -1,5 +1,7 @@
 # AF Wind Widget
 
+![AF Wind Widget](docs/screenshot.png)
+
 Fork personnel de [AF Weather Widget](https://github.com/Gitsaibot/AF-Weather-Widget) : le même widget météo graphique pour Android, avec en plus le **vent moyen et les rafales** (km/h), et les prévisions des **modèles Météo-France** (AROME puis ARPEGE) via [Open-Meteo](https://open-meteo.com/).
 
 ## Ce qui change par rapport à l'original
