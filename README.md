@@ -12,6 +12,7 @@ Personal fork of [AF Weather Widget](https://github.com/Gitsaibot/AF-Weather-Wid
 - **Top line**: the current wind ("Wind 18 km/h (gust 38)") replaces the sea level pressure (MSLP).
 - **New settings** (Appearance → Wind): show wind, threshold, mean wind color, gust color and above-threshold color.
 - **Location search and time zones**: Open-Meteo instead of GeoNames (no GeoNames account needed).
+- **Weather icons**: the original color icons, or the monochrome [Meteocons](https://github.com/basmilius/meteocons) or [Material Symbols](https://github.com/google/material-design-icons) sets in a color of your choice (Appearance → Weather icons).
 - **Backup and restore**: save the settings and locations to a file (Downloads, Google Drive...) and load them back, from the main settings screen.
 - **Smaller APK**: unused library code and resources are removed at build time.
 - The app is called "AF Wind" (`net.auborddulit.afwind`) and can be installed next to the original.
@@ -26,4 +27,5 @@ Every change makes GitHub build a new APK automatically (after the unit tests pa
 - Weather data: [Open-Meteo](https://open-meteo.com/) ([CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)), based on the models of [Météo-France](https://meteofrance.com/).
 - Sun and moon rise/set: [Norwegian Meteorological Institute (MET Norway)](https://api.met.no/).
 - Weather icons: owned by MET Norway, via their [weathericon API](https://api.met.no/weatherapi/weathericon/2.0/documentation).
+- Monochrome weather icons: [Meteocons](https://github.com/basmilius/meteocons) by Bas Milius (MIT) and [Material Symbols](https://github.com/google/material-design-icons) by Google (Apache 2.0) — licences in [`licenses/`](licenses/).
 - App icon: [bharathp666 (DeviantArt)](http://bharathp666.deviantart.com/).

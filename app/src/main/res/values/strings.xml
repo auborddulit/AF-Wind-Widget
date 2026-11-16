@@ -306,5 +306,11 @@
 	<string name="export_settings_failed_toast">Could not save the settings</string>
 	<string name="import_settings_done_toast">Settings restored (%1$d locations added). Tap Apply Changes to use them.</string>
 	<string name="import_settings_failed_toast">This file is not an AF Wind settings backup</string>
+	<!-- Weather icons -->
+	<string name="icon_style_string" translatable="false">icon_style_string</string>
+	<string name="icon_color_int" translatable="false">icon_color_int</string>
+	<string name="ui_settings_category_icons">Weather icons</string>
+	<string name="icon_style_title">Icon style</string>
+	<string name="icon_color_title">Icon color (monochrome styles)</string>
 
 </resources>

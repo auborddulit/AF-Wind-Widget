@@ -20,6 +20,7 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.TimeZone;
 
+import net.gitsaibot.af.AfIconSets;
 import net.gitsaibot.af.AfProvider.AfLocations;
 import net.gitsaibot.af.AfProvider.AfSunMoonData;
 import net.gitsaibot.af.IntervalData;
@@ -113,6 +114,12 @@ public class AfDetailedWidget {
 	
 	private Paint mMinRainPaint, mMaxRainPaint;
 	
+	/* Weather icon set: color (MET Norway) or monochrome tinted with mIconPaint */
+	private int[] mDayIcons = WEATHER_ICONS_DAY;
+	private int[] mNightIcons = WEATHER_ICONS_NIGHT;
+	private int[] mPolarIcons = WEATHER_ICONS_POLAR;
+	private Paint mIconPaint = null;
+
 	/* Wind (AF Wind Widget) */
 	private Paint mWindPaint, mWindStrongPaint, mGustPaint, mGustStrongPaint;
 	private Paint mWindThresholdPaint, mWindLabelPaint;
@@ -1144,7 +1151,7 @@ public class AfDetailedWidget {
 			calendar.setTimeInMillis(slotCenterTime);
 			truncateDay(calendar);
 			long iconDate = calendar.getTimeInMillis();
-			int[] weatherIcons = WEATHER_ICONS_NIGHT; // Default to Night
+			int[] weatherIcons = mNightIcons; // Default to Night
 
 			SunMoonData relevantSmd = null;
 			for (SunMoonData smd : mSunMoonData) {
@@ -1156,11 +1163,11 @@ public class AfDetailedWidget {
 
 			if (relevantSmd != null) {
 				if (relevantSmd.sunRise == AfSunMoonData.NEVER_RISE) {
-					weatherIcons = WEATHER_ICONS_POLAR; // Polar Night
+					weatherIcons = mPolarIcons; // Polar Night
 				} else if (relevantSmd.sunSet == AfSunMoonData.NEVER_SET) {
-					weatherIcons = WEATHER_ICONS_DAY; // Polar Day
+					weatherIcons = mDayIcons; // Polar Day
 				} else if (slotCenterTime >= relevantSmd.sunRise && slotCenterTime < relevantSmd.sunSet) {
-					weatherIcons = WEATHER_ICONS_DAY; // Standard Day
+					weatherIcons = mDayIcons; // Standard Day
 				}
 			}
 
@@ -1174,7 +1181,7 @@ public class AfDetailedWidget {
 			// Draw the final icon
 			Bitmap weatherIcon = ((BitmapDrawable) Objects.requireNonNull(ResourcesCompat.getDrawable(
 					mContext.getResources(), iconResourceId, null))).getBitmap();
-			canvas.drawBitmap(weatherIcon, null, dest, null);
+			canvas.drawBitmap(weatherIcon, null, dest, mIconPaint);
 		}
 	}
 
@@ -1286,6 +1293,32 @@ public class AfDetailedWidget {
 		mWindThresholdPaint = buildLinePaint((strongColor & 0x00FFFFFF) | 0x99000000);
 		mWindThresholdPaint.setStrokeCap(Paint.Cap.BUTT);
 		mWindLabelPaint = buildTextPaint(mWidgetSettings.getTextColor());
+
+		setupIconSet();
+	}
+
+	private void setupIconSet() {
+		int style = mWidgetSettings.getIconStyle();
+		if (style == AfWidgetSettings.ICON_STYLE_METEOCONS) {
+			mDayIcons = AfIconSets.METEOCONS_DAY;
+			mNightIcons = AfIconSets.METEOCONS_NIGHT;
+		} else if (style == AfWidgetSettings.ICON_STYLE_MATERIAL) {
+			mDayIcons = AfIconSets.MATERIAL_DAY;
+			mNightIcons = AfIconSets.MATERIAL_NIGHT;
+		} else {
+			mDayIcons = WEATHER_ICONS_DAY;
+			mNightIcons = WEATHER_ICONS_NIGHT;
+			mPolarIcons = WEATHER_ICONS_POLAR;
+			mIconPaint = null;
+			return;
+		}
+		mPolarIcons = mNightIcons;
+
+		// White icons tinted with the chosen color
+		mIconPaint = new Paint();
+		mIconPaint.setAntiAlias(true);
+		mIconPaint.setFilterBitmap(true);
+		mIconPaint.setColorFilter(new PorterDuffColorFilter(mWidgetSettings.getIconColor(), PorterDuff.Mode.SRC_IN));
 	}
 
 	private static Paint buildFillPaint(int color, boolean antiAlias) {

@@ -19,6 +19,10 @@ import androidx.core.content.ContextCompat;
 
 public class AfWidgetSettings {
 
+	public static final int ICON_STYLE_COLOR = 1;
+	public static final int ICON_STYLE_METEOCONS = 2;
+	public static final int ICON_STYLE_MATERIAL = 3;
+
 	private Context mContext;
 	private Map<String, Object> mSettings;
 
@@ -36,6 +40,7 @@ public class AfWidgetSettings {
 		mIntegerKeys.add(context.getString(R.string.temperature_units_string));
 		mIntegerKeys.add(context.getString(R.string.precipitation_units_string));
 		mIntegerKeys.add(context.getString(R.string.top_text_visibility_string));
+		mIntegerKeys.add(context.getString(R.string.icon_style_string));
 	}
 	
 	private boolean addSetting(String key, String value)
@@ -89,6 +94,7 @@ public class AfWidgetSettings {
 		settings.put(context.getString(R.string.temperature_units_string), 1);
 		settings.put(context.getString(R.string.precipitation_units_string), 1);
 		settings.put(context.getString(R.string.top_text_visibility_string), 4);
+		settings.put(context.getString(R.string.icon_style_string), ICON_STYLE_COLOR);
 		
 		settings.put(context.getString(R.string.day_effect_bool), Boolean.TRUE);
 		settings.put(context.getString(R.string.border_enabled_bool), Boolean.TRUE);
@@ -206,7 +212,8 @@ public class AfWidgetSettings {
 				{ R.string.below_freezing_color_int, R.color.below_freezing },
 				{ R.string.wind_color_int, R.color.wind },
 				{ R.string.gust_color_int, R.color.gust },
-				{ R.string.wind_strong_color_int, R.color.wind_strong } };
+				{ R.string.wind_strong_color_int, R.color.wind_strong },
+				{ R.string.icon_color_int, R.color.icon } };
 
 		for (int[] defaultColor : defaultColors) {
 			String key = r.getString(defaultColor[0]);
@@ -365,6 +372,17 @@ public class AfWidgetSettings {
 	public int getBelowFreezingColor() {
 		Integer color = getIntegerSetting(mContext.getString(R.string.below_freezing_color_int));
 		if (color == null) color = ContextCompat.getColor(mContext, R.color.below_freezing);
+		return color;
+	}
+
+	public int getIconStyle() {
+		Integer value = getIntegerSetting(mContext.getString(R.string.icon_style_string));
+		return value != null ? value : ICON_STYLE_COLOR;
+	}
+
+	public int getIconColor() {
+		Integer color = getIntegerSetting(mContext.getString(R.string.icon_color_int));
+		if (color == null) color = ContextCompat.getColor(mContext, R.color.icon);
 		return color;
 	}
 

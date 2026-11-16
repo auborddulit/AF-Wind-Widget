@@ -156,6 +156,27 @@
 
         </PreferenceCategory>
         <PreferenceCategory
+            android:title="@string/ui_settings_category_icons">
+
+                <ListPreference
+                    android:key="@string/icon_style_string"
+                    android:title="@string/icon_style_title"
+                    android:layout="@layout/preference_title"
+                    android:persistent="true"
+                    app:useSimpleSummaryProvider="true"
+                    android:entries="@array/icon_style_readable"
+                    android:entryValues="@array/icon_style_code"
+                    android:defaultValue="1" />
+
+                <net.gitsaibot.af.ColorPreference
+                    android:key="@string/icon_color_int"
+                    android:title="@string/icon_color_title"
+                    android:defaultValue="@color/icon"
+                    android:persistent="true" />
+
+        </PreferenceCategory>
+
+        <PreferenceCategory
             android:title="@string/ui_settings_category_wind">
 
                 <CheckBoxPreference
