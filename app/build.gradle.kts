@@ -103,4 +103,6 @@ dependencies {
     implementation("androidx.work:work-runtime:2.11.0")
 
     testImplementation("junit:junit:4.13.2")
+    // Real org.json for unit tests (the Android one is only a stub on the JVM)
+    testImplementation("org.json:json:20240303")
 }

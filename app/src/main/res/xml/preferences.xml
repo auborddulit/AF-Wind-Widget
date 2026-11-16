@@ -41,4 +41,18 @@
         android:layout="@layout/preference_title"
         android:key="@string/location_settings_key"/>
 
+    <Preference
+        android:key="export_settings_preference"
+        android:title="@string/export_settings_title"
+        android:summary="@string/export_settings_summary"
+        android:icon="@drawable/ic_outline_backup"
+        android:layout="@layout/preference_title"/>
+
+    <Preference
+        android:key="import_settings_preference"
+        android:title="@string/import_settings_title"
+        android:summary="@string/import_settings_summary"
+        android:icon="@drawable/ic_outline_restore"
+        android:layout="@layout/preference_title"/>
+
 </PreferenceScreen>

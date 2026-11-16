@@ -297,5 +297,14 @@
 	<string name="wind_top">Wind %1$d km/h (gust %2$d)</string>
 	<string name="wind_top_short">Wind %1$d/%2$d</string>
 	<string name="wind_top_no_gust">Wind %1$d km/h</string>
+	<!-- Settings backup and restore -->
+	<string name="export_settings_title">Back up settings</string>
+	<string name="export_settings_summary">Save the settings and locations to a file</string>
+	<string name="import_settings_title">Restore settings</string>
+	<string name="import_settings_summary">Load settings and locations from a backup file</string>
+	<string name="export_settings_done_toast">Settings saved</string>
+	<string name="export_settings_failed_toast">Could not save the settings</string>
+	<string name="import_settings_done_toast">Settings restored (%1$d locations added). Tap Apply Changes to use them.</string>
+	<string name="import_settings_failed_toast">This file is not an AF Wind settings backup</string>
 
 </resources>

@@ -24,6 +24,13 @@ import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 
 import net.gitsaibot.af.location.AfLocationSelectionActivity;
+
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 import net.gitsaibot.af.util.AfLocationInfo;
 import net.gitsaibot.af.util.AfWidgetInfo;
 
@@ -44,12 +51,16 @@ public class AfPreferenceFragment extends PreferenceFragmentCompat implements
     private Preference mUnitPref;
     private Preference mDeviceProfilePref;
     private Preference mLocationPref;
+    private Preference mExportPref;
+    private Preference mImportPref;
 
     private boolean mActionEdit = false;
     private boolean mActivateCalibrationMode = false;
 
     private ActivityResultLauncher<Intent> deviceProfileLauncher;
     private ActivityResultLauncher<Intent> selectLocationLauncher;
+    private ActivityResultLauncher<String> exportSettingsLauncher;
+    private ActivityResultLauncher<String[]> importSettingsLauncher;
 
     @Override
     public void onCreatePreferences(Bundle bundle, String s) {
@@ -61,6 +72,8 @@ public class AfPreferenceFragment extends PreferenceFragmentCompat implements
         mUpdatePref = findPreference("update_preference");
         mDeviceProfilePref = findPreference("device_profile_preference");
         mLocationPref = findPreference(getString(R.string.location_settings_key));
+        mExportPref = findPreference("export_settings_preference");
+        mImportPref = findPreference("import_settings_preference");
         setupListeners();
     }
 
@@ -124,6 +137,19 @@ public class AfPreferenceFragment extends PreferenceFragmentCompat implements
                             e.printStackTrace();
                         }
                     }
+                });
+
+        // Settings backup: Android asks where to save / which file to open
+        exportSettingsLauncher = registerForActivityResult(
+                new ActivityResultContracts.CreateDocument("application/json"),
+                uri -> {
+                    if (uri != null) exportSettings(uri);
+                });
+
+        importSettingsLauncher = registerForActivityResult(
+                new ActivityResultContracts.OpenDocument(),
+                uri -> {
+                    if (uri != null) importSettings(uri);
                 });
 
         getActivity().setResult(Activity.RESULT_CANCELED);
@@ -282,9 +308,58 @@ public class AfPreferenceFragment extends PreferenceFragmentCompat implements
             Intent intent = new Intent(getContext(), AfLocationSelectionActivity.class);
             selectLocationLauncher.launch(intent);
             return true;
+
+        } else if (preference == mExportPref) {
+            String date = new SimpleDateFormat("yyyy-MM-dd", Locale.US).format(new Date());
+            exportSettingsLauncher.launch("af-wind-settings-" + date + ".json");
+            return true;
+
+        } else if (preference == mImportPref) {
+            importSettingsLauncher.launch(new String[] { "application/json", "text/plain", "application/octet-stream" });
+            return true;
         }
 
         return false;
+    }
+
+    private AfLocationInfo getCurrentLocation() {
+        if (mAfWidgetInfo != null && mAfWidgetInfo.getViewInfo() != null) {
+            return mAfWidgetInfo.getViewInfo().getLocationInfo();
+        }
+        return null;
+    }
+
+    private void exportSettings(Uri uri) {
+        Context context = requireContext();
+        try (OutputStream out = context.getContentResolver().openOutputStream(uri, "wt")) {
+            if (out == null) throw new Exception("No output stream");
+            String json = AfSettingsBackup.buildBackup(context, getCurrentLocation());
+            out.write(json.getBytes(StandardCharsets.UTF_8));
+            Toast.makeText(context, getString(R.string.export_settings_done_toast), Toast.LENGTH_SHORT).show();
+        } catch (Exception e) {
+            Log.d(TAG, "exportSettings() failed: " + e);
+            Toast.makeText(context, getString(R.string.export_settings_failed_toast), Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private void importSettings(Uri uri) {
+        Context context = requireContext();
+        try (InputStream in = context.getContentResolver().openInputStream(uri)) {
+            String json = AfUtils.convertStreamToString(in);
+            AfSettingsBackup.RestoreResult result = AfSettingsBackup.restoreBackup(context, json);
+
+            if (result.selectedLocation != null && mAfWidgetInfo != null) {
+                mAfWidgetInfo.setViewInfo(result.selectedLocation, AfProvider.AfViews.TYPE_DETAILED);
+                mLocationPref.setSummary(result.selectedLocation.getTitle());
+            }
+
+            Toast.makeText(context,
+                    getString(R.string.import_settings_done_toast, result.numLocationsAdded),
+                    Toast.LENGTH_LONG).show();
+        } catch (Exception e) {
+            Log.d(TAG, "importSettings() failed: " + e);
+            Toast.makeText(context, getString(R.string.import_settings_failed_toast), Toast.LENGTH_LONG).show();
+        }
     }
 
     @Override
