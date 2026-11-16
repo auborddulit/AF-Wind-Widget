@@ -1372,8 +1372,11 @@ public class AfProvider extends ContentProvider {
 						+ AfPointDataForecasts.TIME + ","
 						+ AfPointDataForecasts.TEMPERATURE + ","
 						+ AfPointDataForecasts.HUMIDITY + ","
-						+ AfPointDataForecasts.PRESSURE + ") "
-						+ "VALUES (?,?,?,?,?,?)");
+						+ AfPointDataForecasts.PRESSURE + ","
+						+ AfPointDataForecasts.WIND_SPEED + ","
+						+ AfPointDataForecasts.WIND_GUST + ","
+						+ AfPointDataForecasts.WIND_DIRECTION + ") "
+						+ "VALUES (?,?,?,?,?,?,?,?,?)");
 		
 		for (ContentValues value : values)
 		{
