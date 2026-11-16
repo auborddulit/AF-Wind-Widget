@@ -57,6 +57,9 @@ public class AfUpdate {
     private AfWidgetInfo mAfWidgetInfo;
     private AfSettings mAfSettings;
 
+    // Last update error, shown on the widget so problems can be diagnosed without a computer
+    private String mLastError = null;
+
     private AfUpdate(Context context, AfWidgetInfo afWidgetInfo, AfSettings afSettings) {
         mContext = context;
         mAfWidgetInfo = afWidgetInfo;
@@ -118,6 +121,7 @@ public class AfUpdate {
                         isWifiConnectionMissing = false;
                     }
                     catch (AfDataUpdateException e) {
+                        mLastError = e.getMessage() != null ? e.getMessage() : e.toString();
                         if (e.reason == AfDataUpdateException.Reason.RATE_LIMITED) {
                             isRateLimited = true;
                             numAttemptsRemaining = 0;
@@ -125,6 +129,7 @@ public class AfUpdate {
                         Log.d(TAG, String.format("update() failed: %s", e));
                     }
                     catch (Exception e) {
+                        mLastError = e.toString();
                         Log.d(TAG, String.format("update() failed: %s", e));
                     }
                 } else {
@@ -194,7 +199,12 @@ public class AfUpdate {
                 } else if (isWifiConnectionMissing) {
                     updateWidgetRemoteViews("WiFi is required and missing", true);
                 } else {
-                    updateWidgetRemoteViews(mContext.getString(R.string.widget_no_weather_data), true);
+                    String message = mContext.getString(R.string.widget_no_weather_data);
+                    if (mLastError != null) {
+                        String detail = mLastError.length() > 160 ? mLastError.substring(0, 160) + "..." : mLastError;
+                        message = message + "\n" + detail;
+                    }
+                    updateWidgetRemoteViews(message, true);
                 }
             } else {
                 if (mAfSettings.getCachedUseSpecificDimensions()) {
@@ -362,18 +372,41 @@ public class AfUpdate {
         Log.d(TAG, "updateData() started uri=" + afLocationInfo.getLocationUri());
 
         AfUtils.clearOldProviderData(mContext.getContentResolver());
-        AfTimeZoneData.build(mContext, this).update(afLocationInfo, mCurrentUtcTime);
-        AfMetSunTimeData.build(mContext, this).update(afLocationInfo, mCurrentUtcTime);
+        try {
+            AfTimeZoneData.build(mContext, this).update(afLocationInfo, mCurrentUtcTime);
+        } catch (Exception e) {
+            // Not fatal: fall back to the phone's time zone
+            Log.d(TAG, "Time zone lookup failed, using the device time zone: " + e);
+            String tz = afLocationInfo.getTimeZone();
+            if (tz == null || tz.trim().isEmpty() || tz.equalsIgnoreCase("null")) {
+                afLocationInfo.setTimeZone(TimeZone.getDefault().getID());
+                afLocationInfo.commit(mContext);
+            }
+        }
+
+        try {
+            AfMetSunTimeData.build(mContext, this).update(afLocationInfo, mCurrentUtcTime);
+        } catch (Exception e) {
+            // Not fatal: the graph is drawn without the day/night shading; retried next update
+            Log.d(TAG, "Sun data failed: " + e);
+        }
 
         int provider = mAfSettings.getCachedProvider();
 
-        if (provider == AfUtils.PROVIDER_NWS) {
-            AfNoaaWeatherData.build(mContext, this).update(afLocationInfo, mCurrentUtcTime);
-        } else if (provider == AfUtils.PROVIDER_NMET) {
-            AfMetWeatherData.build(mContext, this).update(afLocationInfo, mCurrentUtcTime);
-        } else {
-            // Auto and Open-Meteo: Météo-France models through Open-Meteo (includes wind gusts)
-            AfOpenMeteoData.build(mContext, this).update(afLocationInfo, mCurrentUtcTime);
+        try {
+            if (provider == AfUtils.PROVIDER_NWS) {
+                AfNoaaWeatherData.build(mContext, this).update(afLocationInfo, mCurrentUtcTime);
+            } else if (provider == AfUtils.PROVIDER_NMET) {
+                AfMetWeatherData.build(mContext, this).update(afLocationInfo, mCurrentUtcTime);
+            } else {
+                // Auto and Open-Meteo: Météo-France models through Open-Meteo (includes wind gusts)
+                AfOpenMeteoData.build(mContext, this).update(afLocationInfo, mCurrentUtcTime);
+            }
+        } catch (AfDataUpdateException e) {
+            String detail = e.getMessage() != null ? e.getMessage() : e.toString();
+            throw new AfDataUpdateException("Météo : " + detail, e.reason);
+        } catch (RuntimeException e) {
+            throw new AfDataUpdateException("Météo : " + e);
         }
     }
 

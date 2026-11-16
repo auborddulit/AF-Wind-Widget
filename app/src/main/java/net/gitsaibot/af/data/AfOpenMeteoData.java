@@ -217,7 +217,7 @@ public class AfOpenMeteoData implements AfDataSource {
 			throw e;
 		} catch (Exception e) {
 			Log.e(TAG, "update failed", e);
-			throw new AfDataUpdateException(e.getMessage());
+			throw new AfDataUpdateException(e.toString());
 		} finally {
 			if (connection != null) {
 				connection.disconnect();
