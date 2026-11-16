@@ -63,10 +63,9 @@ public class AfUtils {
 	public static final int WIDGET_STATE_MESSAGE = 1;
 	public static final int WIDGET_STATE_RENDER = 2;
 	
+	// Weather sources: Auto = Météo-France models via Open-Meteo, NMET = MET Norway
 	public final static int PROVIDER_AUTO = 1;
 	public final static int PROVIDER_NMET = 2;
-	public final static int PROVIDER_NWS = 3;
-	public final static int PROVIDER_OPENMETEO = 4;
 
 	public static final int PI_FLAG_IMMUTABLE = PendingIntent.FLAG_IMMUTABLE;
 
@@ -699,12 +698,6 @@ public class AfUtils {
 	public static PendingIntent buildDisableSpecificDimensionsIntent(Context context, Uri widgetUri)
 	{
 		Intent intent = new Intent(AfWorker.ACTION_UPDATE_ALL_MINIMAL_DIMENSIONS, widgetUri, context, AfServiceReceiver.class);
-		return PendingIntent.getBroadcast(context, 0, intent, PI_FLAG_IMMUTABLE);
-	}
-	
-	public static PendingIntent buildWidgetProviderAutoIntent(Context context, Uri widgetUri)
-	{
-		Intent intent = new Intent(AfWorker.ACTION_UPDATE_ALL_PROVIDER_AUTO, widgetUri, context, AfServiceReceiver.class);
 		return PendingIntent.getBroadcast(context, 0, intent, PI_FLAG_IMMUTABLE);
 	}
 	

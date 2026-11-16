@@ -33,35 +33,12 @@ import net.gitsaibot.af.AfProvider.AfLocationsColumns;
 import net.gitsaibot.af.R;
 
 import java.util.List;
-import java.util.Map;
 
 public class AfLocationSelectionActivity extends AppCompatActivity implements View.OnClickListener {
 
     private LocationViewModel locationViewModel;
     private SimpleCursorAdapter mAdapter;
     private ProgressBar mProgressBar;
-    private static final Map<Integer, String> geonamesWebserviceExceptions;
-
-    static {
-        geonamesWebserviceExceptions = Map.ofEntries(
-                Map.entry(10, "Authorization exception"),
-                Map.entry(11, "Record does not exist"),
-                Map.entry(12, "Other error"),
-                Map.entry(13, "Database timeout"),
-                Map.entry(14, "Invalid parameter"),
-                Map.entry(15, "No result found"),
-                Map.entry(16, "Duplicate exception"),
-                Map.entry(17, "Postal code not found"),
-                Map.entry(18, "Daily limit of credits exceeded"),
-                Map.entry(19, "Hourly limit of credits exceeded"),
-                Map.entry(20, "Weekly limit of credits exceeded"),
-                Map.entry(21, "Invalid input"),
-                Map.entry(22, "Server overloaded exception"),
-                Map.entry(23, "Service not implemented"),
-                Map.entry(24, "Radius too large")
-        );
-    }
-
     private static final String TAG = "AfLocationSelection";
 
     private static final int CONTEXT_MENU_EDIT = Menu.FIRST;
@@ -151,9 +128,7 @@ public class AfLocationSelectionActivity extends AppCompatActivity implements Vi
         mProgressBar.setVisibility(View.GONE);
 
         if (status >= LocationViewModel.SEARCH_ERROR) {
-            final int errorCode = status - LocationViewModel.SEARCH_ERROR;
-            final String errorString = geonamesWebserviceExceptions.getOrDefault(errorCode, getString(R.string.location_search_error_toast));
-            Toast.makeText(mContext, errorString, Toast.LENGTH_SHORT).show();
+            Toast.makeText(mContext, getString(R.string.location_search_error_toast), Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -170,14 +145,6 @@ public class AfLocationSelectionActivity extends AppCompatActivity implements Vi
             case LocationViewModel.NO_RESULTS -> Toast.makeText(
                     AfLocationSelectionActivity.this,
                     getString(R.string.location_search_no_results),
-                    Toast.LENGTH_SHORT).show();
-            case LocationViewModel.OVER_QUERY_LIMIT -> Toast.makeText(
-                    AfLocationSelectionActivity.this,
-                    getString(R.string.location_search_over_query_limit_toast),
-                    Toast.LENGTH_LONG).show();
-            case LocationViewModel.REQUEST_DENIED -> Toast.makeText(
-                    AfLocationSelectionActivity.this,
-                    getString(R.string.location_search_request_denied_toast),
                     Toast.LENGTH_SHORT).show();
             case LocationViewModel.INVALID_REQUEST -> Toast.makeText(
                     AfLocationSelectionActivity.this,

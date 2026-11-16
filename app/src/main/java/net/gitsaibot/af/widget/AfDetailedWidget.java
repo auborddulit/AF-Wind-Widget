@@ -121,7 +121,7 @@ public class AfDetailedWidget {
 	private double mWindLabelStep;
 	private float mRightLabelWidth;
 	
-	private TimeZone mUtcTimeZone = TimeZone.getTimeZone("UTC");
+	private final TimeZone mUtcTimeZone = TimeZone.getTimeZone("UTC");
 	
 	/* Render Properties */
 
@@ -173,13 +173,7 @@ public class AfDetailedWidget {
 		DisplayMetrics dm = mContext.getResources().getDisplayMetrics();
 		mDP = dm.density;
 		
-		mTextSize = 10.0f * mDP;
-		mLabelTextSize = 9.0f * mDP;
-		mIconHeight = 19.0f * mDP;
-		mIconWidth = 19.0f * mDP;
-		mIconSpacingY = 2.0f * mDP;
-		
-		setupPaintDimensions();
+		updateDynamicDimensions(1.0f);
 		
 		return this;
 	}
@@ -1061,7 +1055,6 @@ public class AfDetailedWidget {
 		}
 	}
 
-	// DELETE the current drawWeatherIcons method and REPLACE it with this one.
 	private void drawWeatherIcons(Canvas canvas) {
 		int hoursPerIcon = mNumHoursBetweenSamples; // 2 hours
 		int numIcons = mNumHours / hoursPerIcon;   // 12 icons
@@ -1263,89 +1256,62 @@ public class AfDetailedWidget {
 	}
 
 	
-	private void setupPaintDimensions()
-	{
-		mTextPaint.setTextSize(mTextSize);
-		mLabelPaint.setTextSize(mLabelTextSize);
-		mAboveFreezingTemperaturePaint.setStrokeWidth(2.0f * mDP);
-		mBelowFreezingTemperaturePaint.setStrokeWidth(2.0f * mDP);
-		mMaxRainPaint.setStrokeWidth(mDP);
-	}
-	
 	private void setupPaints() {
-		mBorderPaint = new Paint() {{
-			setAntiAlias(true);
-			setColor(mWidgetSettings.getBorderColor());
-			setStyle(Paint.Style.FILL);
-		}};
-		mBackgroundPaint = new Paint() {{
-			setColor(mWidgetSettings.getBackgroundColor());
-			setStyle(Paint.Style.FILL);
-		}};
+		mBorderPaint = buildFillPaint(mWidgetSettings.getBorderColor(), true);
+		mBackgroundPaint = buildFillPaint(mWidgetSettings.getBackgroundColor(), false);
+
 		final Bitmap bgPattern = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.pattern);
-		mPatternPaint = new Paint() {{
-			setShader(new BitmapShader(bgPattern, Shader.TileMode.REPEAT, Shader.TileMode.REPEAT));
-			setColorFilter(new PorterDuffColorFilter(mWidgetSettings.getPatternColor(), PorterDuff.Mode.SRC_IN));
-		}};
-		
-		mTextPaint = new Paint() {{
-			setAntiAlias(true);
-			setColor(mWidgetSettings.getTextColor());
-		}};
-		mLabelPaint = new Paint() {{
-			setAntiAlias(true);
-			setColor(mWidgetSettings.getTextColor());
-		}};
-		
-		mGridPaint = new Paint() {{
-			setColor(mWidgetSettings.getGridColor());
-			setStyle(Paint.Style.STROKE);
-		}};
-		mGridOutlinePaint = new Paint() {{
-			setColor(mWidgetSettings.getGridOutlineColor());
-			setStyle(Paint.Style.STROKE);
-		}};
-		
-		mAboveFreezingTemperaturePaint = new Paint() {{
-			setAntiAlias(true);
-			setColor(mWidgetSettings.getAboveFreezingColor());
-			setStrokeCap(Paint.Cap.ROUND);
-			setStyle(Paint.Style.STROKE);
-		}};
-		mBelowFreezingTemperaturePaint = new Paint() {{
-			setAntiAlias(true);
-			setColor(mWidgetSettings.getBelowFreezingColor());
-			setStrokeCap(Paint.Cap.ROUND);
-			setStyle(Paint.Style.STROKE);
-		}};
-		
-		mMinRainPaint = new Paint() {{
-			setAntiAlias(false);
-			setColor(mWidgetSettings.getMinRainColor());
-			setStyle(Paint.Style.FILL);
-		}};
-		mMaxRainPaint = new Paint() {{
-			setAntiAlias(true);
-			setColor(mWidgetSettings.getMaxRainColor());
-			setStrokeCap(Paint.Cap.SQUARE);
-			setStyle(Paint.Style.STROKE);
-		}};
+		mPatternPaint = new Paint();
+		mPatternPaint.setShader(new BitmapShader(bgPattern, Shader.TileMode.REPEAT, Shader.TileMode.REPEAT));
+		mPatternPaint.setColorFilter(new PorterDuffColorFilter(mWidgetSettings.getPatternColor(), PorterDuff.Mode.SRC_IN));
 
-		final int windColor = mWidgetSettings.getWindColor();
-		final int gustColor = mWidgetSettings.getGustColor();
+		mTextPaint = buildTextPaint(mWidgetSettings.getTextColor());
+		mLabelPaint = buildTextPaint(mWidgetSettings.getTextColor());
+
+		mGridPaint = buildStrokePaint(mWidgetSettings.getGridColor(), false);
+		mGridOutlinePaint = buildStrokePaint(mWidgetSettings.getGridOutlineColor(), false);
+
+		mAboveFreezingTemperaturePaint = buildLinePaint(mWidgetSettings.getAboveFreezingColor());
+		mBelowFreezingTemperaturePaint = buildLinePaint(mWidgetSettings.getBelowFreezingColor());
+
+		mMinRainPaint = buildFillPaint(mWidgetSettings.getMinRainColor(), false);
+		mMaxRainPaint = buildStrokePaint(mWidgetSettings.getMaxRainColor(), true);
+		mMaxRainPaint.setStrokeCap(Paint.Cap.SQUARE);
+
 		final int strongColor = mWidgetSettings.getWindStrongColor();
-
-		mWindPaint = buildLinePaint(windColor);
+		mWindPaint = buildLinePaint(mWidgetSettings.getWindColor());
+		mGustPaint = buildLinePaint(mWidgetSettings.getGustColor());
 		mWindStrongPaint = buildLinePaint(strongColor);
-		mGustPaint = buildLinePaint(gustColor);
 		mGustStrongPaint = buildLinePaint(strongColor);
 		mWindThresholdPaint = buildLinePaint((strongColor & 0x00FFFFFF) | 0x99000000);
 		mWindThresholdPaint.setStrokeCap(Paint.Cap.BUTT);
-		mWindLabelPaint = new Paint();
-		mWindLabelPaint.setAntiAlias(true);
-		mWindLabelPaint.setColor(windColor);
+		mWindLabelPaint = buildTextPaint(mWidgetSettings.getTextColor());
 	}
 
+	private static Paint buildFillPaint(int color, boolean antiAlias) {
+		Paint paint = new Paint();
+		paint.setAntiAlias(antiAlias);
+		paint.setColor(color);
+		paint.setStyle(Paint.Style.FILL);
+		return paint;
+	}
+
+	private static Paint buildStrokePaint(int color, boolean antiAlias) {
+		Paint paint = new Paint();
+		paint.setAntiAlias(antiAlias);
+		paint.setColor(color);
+		paint.setStyle(Paint.Style.STROKE);
+		return paint;
+	}
+
+	private static Paint buildTextPaint(int color) {
+		Paint paint = new Paint();
+		paint.setAntiAlias(true);
+		paint.setColor(color);
+		return paint;
+	}
+
+	/** Anti-aliased line with round caps and joins (temperature and wind curves). */
 	private static Paint buildLinePaint(int color) {
 		Paint paint = new Paint();
 		paint.setAntiAlias(true);
@@ -1381,7 +1347,21 @@ public class AfDetailedWidget {
 
 		if (numSamples < 3) return; // No wind data (e.g. a source without wind)
 
-		double threshold = mWidgetSettings.getWindThreshold();
+		double[] scale = computeWindScale(maxValue, mWidgetSettings.getWindThreshold());
+		mWindScaleMax = scale[0];
+		mWindLabelStep = scale[1];
+
+		String widestLabel = Integer.toString((int) Math.round(mWindScaleMax));
+		mRightLabelWidth = mWindLabelPaint.measureText(widestLabel) + 3.0f * mDP;
+		mDrawWind = true;
+	}
+
+	/**
+	 * Picks the km/h scale: room above the strongest gust and above the threshold,
+	 * at most 4 labelled steps of 5, 10, 20, 25, 50 or 100 km/h.
+	 * @return { scale maximum, label step }
+	 */
+	static double[] computeWindScale(double maxValue, double threshold) {
 		double top = Math.max(20.0, Math.max(maxValue * 1.1, threshold * 1.25));
 
 		double[] steps = { 5.0, 10.0, 20.0, 25.0, 50.0, 100.0 };
@@ -1392,13 +1372,7 @@ public class AfDetailedWidget {
 				break;
 			}
 		}
-
-		mWindLabelStep = step;
-		mWindScaleMax = Math.ceil(top / step) * step;
-
-		String widestLabel = Integer.toString((int) Math.round(mWindScaleMax));
-		mRightLabelWidth = mWindLabelPaint.measureText(widestLabel) + 3.0f * mDP;
-		mDrawWind = true;
+		return new double[] { Math.ceil(top / step) * step, step };
 	}
 
 	private Path buildWindPath(boolean gusts) {
@@ -1461,9 +1435,6 @@ public class AfDetailedWidget {
 
 	private void drawWindLabels(Canvas canvas) {
 		float labelTextPaddingX = 2.5f * mDP;
-		// Same color as the other labels of the widget
-		mWindLabelPaint.setColor(mWidgetSettings.getTextColor());
-
 		// Skip labels if they would overlap
 		double pixelsPerStep = mWindLabelStep / mWindScaleMax * mGraphRect.height();
 		int every = 1;

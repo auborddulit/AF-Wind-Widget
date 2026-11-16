@@ -621,18 +621,6 @@ public class AfSettings {
 		return editor;
 	}
 	
-	public Editor editLocationCountryCode(Editor editor, long locationId, String value)
-	{
-		if (editor == null)
-		{
-			editor = mSharedPreferences.edit();
-		}
-		
-		editor.putString("global_lcountry_" + locationId, value);
-		
-		return editor;
-	}
-	
 	public Editor editOrientationMode(Editor editor, boolean temporary, int value) {
 		// Verify value
 		if (value < 0 || value > 2) {
@@ -671,12 +659,6 @@ public class AfSettings {
 		return mSharedPreferences.getLong(key, -1);
 	}
 	
-	public String getLocationCountryCode(long locationId)
-	{
-		String key = "global_lcountry_" + locationId;
-		return mSharedPreferences.getString(key, null);
-	}
-	
 	public long getLastProfileSyncPreference() {
 		String key = mContext.getString(R.string.preference_lastProfileSync_long);
 		return mSharedPreferences.getLong(key, -1);
@@ -712,11 +694,6 @@ public class AfSettings {
 	
 	public void setLastProfileSyncPreference(long value) {
 		editLastProfileSync(null, PREFERENCE, value).commit();
-	}
-	
-	public void setLocationCountryCode(long locationId, String value)
-	{
-		editLocationCountryCode(null, locationId, value).commit();
 	}
 	
 	public void setOrientationModePreference(int value) {

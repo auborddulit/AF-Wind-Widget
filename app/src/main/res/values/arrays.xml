@@ -50,15 +50,13 @@
 	</string-array>
 	
 	<string-array name="provider_readable">
-		<item>Auto (Météo-France via Open-Meteo)</item>
+		<item>Auto (Météo-France models via Open-Meteo)</item>
 		<item>Norwegian Meteorological Institute</item>
-		<item>NOAA NWS (US)</item>
 	</string-array>
 	
 	<string-array name="provider_code" translatable="false">
 		<item>1</item>
 		<item>2</item>
-		<item>3</item>
 	</string-array>
 
 	<string-array name="orientation_modes">

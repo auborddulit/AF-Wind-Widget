@@ -1365,18 +1365,7 @@ public class AfProvider extends ContentProvider {
 	{
 		int numInserted = 0;
 		
-		SQLiteStatement insert =
-				db.compileStatement("INSERT INTO " + TABLE_AIXPOINTDATAFORECASTS + "("
-						+ AfPointDataForecasts.LOCATION + ","
-						+ AfPointDataForecasts.TIME_ADDED + ","
-						+ AfPointDataForecasts.TIME + ","
-						+ AfPointDataForecasts.TEMPERATURE + ","
-						+ AfPointDataForecasts.HUMIDITY + ","
-						+ AfPointDataForecasts.PRESSURE + ","
-						+ AfPointDataForecasts.WIND_SPEED + ","
-						+ AfPointDataForecasts.WIND_GUST + ","
-						+ AfPointDataForecasts.WIND_DIRECTION + ") "
-						+ "VALUES (?,?,?,?,?,?,?,?,?)");
+		SQLiteStatement insert = db.compileStatement(buildPointDataInsertSql());
 		
 		for (ContentValues value : values)
 		{
@@ -1421,6 +1410,33 @@ public class AfProvider extends ContentProvider {
 		}
 		
 		return numInserted;
+	}
+
+	/** Columns filled by bulkInsertPointData, in bind order (1-based index = position + 1). */
+	static final String[] POINT_DATA_INSERT_COLUMNS = {
+			AfPointDataForecastColumns.LOCATION,
+			AfPointDataForecastColumns.TIME_ADDED,
+			AfPointDataForecastColumns.TIME,
+			AfPointDataForecastColumns.TEMPERATURE,
+			AfPointDataForecastColumns.HUMIDITY,
+			AfPointDataForecastColumns.PRESSURE,
+			AfPointDataForecastColumns.WIND_SPEED,
+			AfPointDataForecastColumns.WIND_GUST,
+			AfPointDataForecastColumns.WIND_DIRECTION };
+
+	/** Builds the INSERT statement so the number of "?" always matches the columns. */
+	static String buildPointDataInsertSql() {
+		StringBuilder columns = new StringBuilder();
+		StringBuilder placeholders = new StringBuilder();
+		for (int i = 0; i < POINT_DATA_INSERT_COLUMNS.length; i++) {
+			if (i > 0) {
+				columns.append(',');
+				placeholders.append(',');
+			}
+			columns.append(POINT_DATA_INSERT_COLUMNS[i]);
+			placeholders.append('?');
+		}
+		return "INSERT INTO " + TABLE_AIXPOINTDATAFORECASTS + "(" + columns + ") VALUES (" + placeholders + ")";
 	}
 
 	private static void bindOptionalDouble(SQLiteStatement statement, int index, Double value) {

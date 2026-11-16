@@ -23,7 +23,6 @@ import androidx.work.WorkManager;
 import net.gitsaibot.af.data.AfDataUpdateException;
 import net.gitsaibot.af.data.AfMetSunTimeData;
 import net.gitsaibot.af.data.AfMetWeatherData;
-import net.gitsaibot.af.data.AfNoaaWeatherData;
 import net.gitsaibot.af.data.AfOpenMeteoData;
 import net.gitsaibot.af.data.AfTimeZoneData;
 import net.gitsaibot.af.util.AfLocationInfo;
@@ -191,10 +190,7 @@ public class AfUpdate {
 
         if (!drawSuccess) {
             if (shouldUpdate && !updateSuccess) {
-                if (mAfSettings.getCachedProvider() == AfUtils.PROVIDER_NWS && !isLocationInUS(afLocationInfo)) {
-                    PendingIntent pendingIntent = AfUtils.buildWidgetProviderAutoIntent(mContext, mWidgetUri);
-                    AfUtils.updateWidgetRemoteViews(mContext, mAfWidgetInfo.getAppWidgetId(), "NWS source cannot be used outside US.\nTap widget to revert to auto", true, pendingIntent);
-                } else if (isRateLimited) {
+                if (isRateLimited) {
                     updateWidgetRemoteViews("API is currently rate limited", true);
                 } else if (isWifiConnectionMissing) {
                     updateWidgetRemoteViews("WiFi is required and missing", true);
@@ -230,12 +226,6 @@ public class AfUpdate {
             return (nc != null && nc.hasTransport(NetworkCapabilities.TRANSPORT_WIFI));
         }
         return false;
-    }
-
-    private boolean isLocationInUS(AfLocationInfo locationInfo) {
-        String widgetCountryCode = "global_lcountry_" + locationInfo.getId();
-        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(mContext);
-        return settings.getString(widgetCountryCode, "").equalsIgnoreCase("us");
     }
 
     private void scheduleUpdate(long updateTime) {
@@ -394,9 +384,7 @@ public class AfUpdate {
         int provider = mAfSettings.getCachedProvider();
 
         try {
-            if (provider == AfUtils.PROVIDER_NWS) {
-                AfNoaaWeatherData.build(mContext, this).update(afLocationInfo, mCurrentUtcTime);
-            } else if (provider == AfUtils.PROVIDER_NMET) {
+            if (provider == AfUtils.PROVIDER_NMET) {
                 AfMetWeatherData.build(mContext, this).update(afLocationInfo, mCurrentUtcTime);
             } else {
                 // Auto and Open-Meteo: Météo-France models through Open-Meteo (includes wind gusts)
@@ -404,9 +392,9 @@ public class AfUpdate {
             }
         } catch (AfDataUpdateException e) {
             String detail = e.getMessage() != null ? e.getMessage() : e.toString();
-            throw new AfDataUpdateException("Météo : " + detail, e.reason);
+            throw new AfDataUpdateException("Weather: " + detail, e.reason);
         } catch (RuntimeException e) {
-            throw new AfDataUpdateException("Météo : " + e);
+            throw new AfDataUpdateException("Weather: " + e);
         }
     }
 

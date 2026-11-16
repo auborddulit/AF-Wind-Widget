@@ -39,8 +39,6 @@ android {
         versionName = "1.0.$buildNumber"
         buildConfigField("String", "USER_AGENT", "\"" + getKey("user_agent") + "\"")
         buildConfigField("String", "API_KEY", "\"" + getKey("apiKey") + "\"")
-        buildConfigField("String", "USER_GEONAMES", "\"" + getKey("user_geonames") + "\"")
-        multiDexEnabled = true
     }
 
     signingConfigs {
@@ -58,7 +56,9 @@ android {
         release {
             signingConfig = if (signingKeystoreFile.exists()) signingConfigs.getByName("release")
                             else signingConfigs.getByName("debug")
-            isMinifyEnabled = false
+            // Remove unused library code and resources: much smaller APK
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.txt"
@@ -79,6 +79,11 @@ android {
         abortOnError = false
     }
 
+    testOptions {
+        // Android classes (Log, Uri...) return default values in plain JVM unit tests
+        unitTests.isReturnDefaultValues = true
+    }
+
     compileOptions {
         sourceCompatibility(JavaVersion.VERSION_17)
         targetCompatibility(JavaVersion.VERSION_17)
@@ -90,12 +95,12 @@ dependencies {
     implementation("androidx.appcompat:appcompat:1.7.1")
     implementation("androidx.constraintlayout:constraintlayout:2.2.1")
     implementation("androidx.preference:preference:1.2.1")
-    implementation("androidx.legacy:legacy-preference-v14:1.0.0")
     implementation("com.google.code.gson:gson:2.13.2")
     implementation("com.google.android.material:material:1.13.0")
-    implementation(platform("org.jetbrains.kotlin:kotlin-bom:1.8.22"))
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.10.0")
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.10.0")
-    implementation("androidx.activity:activity-ktx:1.12.2")
+    implementation("androidx.lifecycle:lifecycle-viewmodel:2.10.0")
+    implementation("androidx.lifecycle:lifecycle-livedata:2.10.0")
+    implementation("androidx.activity:activity:1.12.2")
     implementation("androidx.work:work-runtime:2.11.0")
+
+    testImplementation("junit:junit:4.13.2")
 }

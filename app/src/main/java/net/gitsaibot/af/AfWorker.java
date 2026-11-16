@@ -48,7 +48,6 @@ public class AfWorker extends Worker {
 	public final static String ACTION_DELETE_WIDGET = "net.gitsaibot.af.DELETE_WIDGET";
 	public final static String ACTION_UPDATE_ALL = "net.gitsaibot.af.UPDATE_ALL";
 	public final static String ACTION_UPDATE_ALL_MINIMAL_DIMENSIONS = "net.gitsaibot.af.UPDATE_WIDGET_MINIMAL_DIMENSIONS";
-	public final static String ACTION_UPDATE_ALL_PROVIDER_AUTO = "net.gitsaibot.af.UPDATE_WIDGET_PROVIDER_AUTO";
 	public final static String ACTION_UPDATE_ALL_PROVIDER_CHANGE = "net.gitsaibot.af.UPDATE_WIDGET_PROVIDER_CHANGE";
 	public final static String ACTION_UPDATE_WIDGET = "net.gitsaibot.af.UPDATE_WIDGET";
 
@@ -124,17 +123,6 @@ public class AfWorker extends Worker {
 		else if (action.equals(ACTION_UPDATE_ALL_PROVIDER_CHANGE))
 		{
 			AfUtils.clearProviderData(getApplicationContext().getContentResolver());
-			updateAllWidgets(widgetUri);
-		}
-		else if (action.equals(ACTION_UPDATE_ALL_PROVIDER_AUTO))
-		{
-			SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-			SharedPreferences.Editor editor = sharedPreferences.edit();
-			editor.putInt(getApplicationContext().getString(R.string.provider_string), AfUtils.PROVIDER_AUTO);
-			editor.apply();
-
-			AfUtils.clearProviderData(getApplicationContext().getContentResolver());
-
 			updateAllWidgets(widgetUri);
 		}
 		else if (action.equals(ACTION_UPDATE_ALL_MINIMAL_DIMENSIONS))

@@ -71,7 +71,6 @@
 				<action android:name="net.gitsaibot.af.DELETE_WIDGET" />
 				<action android:name="net.gitsaibot.af.UPDATE_ALL" />
 				<action android:name="net.gitsaibot.af.UPDATE_WIDGET_MINIMAL_DIMENSIONS" />
-				<action android:name="net.gitsaibot.af.UPDATE_WIDGET_PROVIDER_AUTO" />
 				<action android:name="net.gitsaibot.af.UPDATE_WIDGET_PROVIDER_CHANGE" />
 				<action android:name="net.gitsaibot.af.UPDATE_WIDGET" />
 				<action android:name="net.gitsaibot.af.DECREASE_LANDSCAPE_HEIGHT" />

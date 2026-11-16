@@ -1,0 +1,10 @@
+# R8 rules for AF Wind Widget
+#
+# The app's own code is small: keep all of it as is. This keeps the classes
+# referenced by name from XML (preferences, fragments, custom views) and the
+# Gson data models (their field names must match the JSON of the weather APIs).
+# R8 still removes the unused code of the libraries, which is most of the APK.
+-keep class net.gitsaibot.af.** { *; }
+
+# Needed by Gson to read generic lists such as List<Float>
+-keepattributes Signature, *Annotation*, InnerClasses, EnclosingMethod

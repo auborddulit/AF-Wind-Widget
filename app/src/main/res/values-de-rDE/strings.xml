@@ -49,12 +49,9 @@
     <string name="precipitation">Niederschlag</string>
     <string name="top_bar_information">Informationen in der oberen Leiste</string>
     <string name="location_search_error_toast">Bei der Suche ist ein Fehler aufgetreten.</string>
-    <string name="location_search_request_denied_toast">Fehler: Suchanfrage verweigert</string>
     <string name="location_search_invalid_request_toast">Fehler: Ungültige Suchanfrage</string>
     <string name="title_configure">AF Wetter: Widget konfigurieren</string>
     <string name="dialog_search_location">Suche nach Standort</string>
-    <string name="noaa">NOAA NWS Daten</string>
-    <string name="location_search_over_query_limit_toast">Tägliches Suchkontingent für Ihre IP-Adresse erschöpft. Versuchen Sie, zu WiFi zu wechseln.</string>
     <string name="precipitation_units_invalid_number_toast">Die Niederschlagsskalierung muss eine Zahl sein.</string>
     <string name="precipitation_units_invalid_range_toast">Die Niederschlagsskalierung muss größer als Null und kleiner als 100 sein.</string>
     <string name="text_color_title">Textfarbe</string>

@@ -12,7 +12,7 @@
 	<string name="temperature_graph">Temperature graph</string>
 	<string name="precipitation">Precipitation</string>
 	<string name="top_bar_information">Top bar information</string>
-	<string name="noaa">NOAA NWS data</string>
+	<string name="wind_help_title">Wind and gusts</string>
 
 	<!-- IntroText -->
 	<string name="intro_text">After installing AF, you must manually add the widget to your homescreen: When setting up a widget for the first time, the only thing which needs to be chosen is the location to view. The most recently saved settings will be used automatically when setting up a new widget. </string>
@@ -34,22 +34,19 @@
 	<!-- Top bar information -->
 	<string name="top_bar_information_text">The top bar of the widget is used to indicate information for the current time.\n
 
-    	\n\u2022 Mean-Sea-Level-Pressure (MSLP) is given in hectopascals (SI), which is equivalent to the millibar.
+    	\n\u2022 The current mean wind and gust speed are given in km/h. When wind is hidden, the Mean-Sea-Level-Pressure (MSLP) is shown instead, in hectopascals.
     	\n\u2022 Relative Humidity (RH) is given as a percentage.
     	\n\u2022 The number to the right of the relative humidity is the precipitation scaling, as described in the previous paragraph.
     	\n\u2022 The number in the parenthesis after the location name indicates the current temperature at that location.
 	</string>
 
-	<!-- NOAA NWS data -->
-	<string name="noaa_nws_data_text">NOAA NWS data should improve the forecasts available to US users,
-		compared to what was previously available from the Norwegian Meteorological Institute.
-		A few differences between the two sources means that:\n
+	<!-- Wind and gusts -->
+	<string name="wind_help_text">Weather data comes from the Météo-France models (AROME, then ARPEGE) through Open-Meteo.\n
 
-    	\n\u2022 Only precipitation amounts are available, maximum/minimum levels are not.
-    	\n\u2022 Pressure data is not available.
-    	\n\u2022 The time between samples varies from 1 to 6 hours.\n
+    	\n\u2022 The solid line is the mean wind speed, the dashed line is the gust speed, both in km/h with the scale on the right side of the graph.
+    	\n\u2022 Above the strong wind threshold (40 km/h by default), the lines change color and a dotted line marks the threshold.\n
 
-		\nYou can select the weather data source manually from the update settings within the AF configuration.
+		\nThe threshold and the colors can be changed in the appearance settings, under Wind.
 	</string>
 
 	<!-- InfoText -->
@@ -87,8 +84,6 @@
  	<string name="location_search_progress_dialog_message">Searching...</string>
  	<string name="location_search_no_connection_toast">Error: No internet connection</string>
 	<string name="location_search_error_toast">An error occurred during search.</string>
-	<string name="location_search_over_query_limit_toast">Daily search quota filled for your IP address. Try changing to WiFi.</string>
-	<string name="location_search_request_denied_toast">Error: Search request denied</string>
 	<string name="location_search_invalid_request_toast">Error: Invalid search request</string>
 
  	<string name="widget_no_weather_data">No weather data found.</string>
@@ -288,19 +283,19 @@
 	<string name="gust_color_int" translatable="false">gust_color_int</string>
 	<string name="wind_strong_color_int" translatable="false">wind_strong_color_int</string>
 
-	<string name="ui_settings_category_wind">Vent</string>
-	<string name="wind_enabled_title">Afficher le vent</string>
-	<string name="wind_enabled_summary_on">Courbes de vent et de rafales affichées</string>
-	<string name="wind_enabled_summary_off">Vent masqué</string>
-	<string name="wind_threshold_title">Seuil de vent fort</string>
+	<string name="ui_settings_category_wind">Wind</string>
+	<string name="wind_enabled_title">Show wind</string>
+	<string name="wind_enabled_summary_on">Wind and gust lines shown</string>
+	<string name="wind_enabled_summary_off">Wind hidden</string>
+	<string name="wind_threshold_title">Strong wind threshold</string>
 	<string name="wind_threshold_summary">%1$s km/h</string>
-	<string name="wind_threshold_invalid_number_toast">Le seuil doit être un nombre.</string>
-	<string name="wind_threshold_invalid_range_toast">Le seuil doit être compris entre 1 et 200 km/h.</string>
-	<string name="wind_color_title">Couleur vent moyen</string>
-	<string name="gust_color_title">Couleur rafales</string>
-	<string name="wind_strong_color_title">Couleur au-dessus du seuil</string>
-	<string name="wind_top">Vent %1$d km/h (raf. %2$d)</string>
-	<string name="wind_top_short">Vent %1$d/%2$d</string>
-	<string name="wind_top_no_gust">Vent %1$d km/h</string>
+	<string name="wind_threshold_invalid_number_toast">The threshold must be a number.</string>
+	<string name="wind_threshold_invalid_range_toast">The threshold must be between 1 and 200 km/h.</string>
+	<string name="wind_color_title">Mean wind color</string>
+	<string name="gust_color_title">Gust color</string>
+	<string name="wind_strong_color_title">Color above threshold</string>
+	<string name="wind_top">Wind %1$d km/h (gust %2$d)</string>
+	<string name="wind_top_short">Wind %1$d/%2$d</string>
+	<string name="wind_top_no_gust">Wind %1$d km/h</string>
 
 </resources>

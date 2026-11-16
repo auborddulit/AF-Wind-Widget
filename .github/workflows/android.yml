@@ -36,6 +36,9 @@ jobs:
       - name: Validate Gradle wrapper
         uses: gradle/actions/wrapper-validation@v4
 
+      - name: Run tests
+        run: ./gradlew testReleaseUnitTest --stacktrace
+
       - name: Build APK
         run: ./gradlew assembleRelease --stacktrace
 
@@ -58,7 +61,16 @@ jobs:
           tag_name: build-${{ github.run_number }}
           name: AF Wind Widget (build ${{ github.run_number }})
           body: |
-            APK à installer sur le téléphone : télécharger le fichier .apk ci-dessous.
-            Commit : ${{ github.sha }}
+            To install on the phone: download the .apk file below and open it.
+            Commit: ${{ github.sha }}
           files: out/*.apk
           make_latest: true
+
+      - name: Keep only the 5 latest releases
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release list --limit 100 --json tagName,createdAt \
+            --jq 'sort_by(.createdAt) | reverse | .[5:] | .[].tagName' \
+          | xargs -r -I{} gh release delete {} --cleanup-tag --yes

@@ -36,8 +36,6 @@ public class LocationViewModel extends AndroidViewModel {
     public final static int SEARCH_CANCELLED = 2;
     public final static int SEARCH_SUCCESS = 4;
     public final static int NO_RESULTS = 5;
-    public final static int OVER_QUERY_LIMIT = 6;
-    public final static int REQUEST_DENIED = 7;
     public final static int INVALID_REQUEST = 8;
     public final static int SEARCH_ERROR = 100;
 

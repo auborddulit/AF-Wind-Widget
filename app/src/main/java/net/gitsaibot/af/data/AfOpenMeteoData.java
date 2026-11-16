@@ -127,7 +127,7 @@ public class AfOpenMeteoData implements AfDataSource {
 
 			mAfUpdate.updateWidgetRemoteViews("Parsing weather data...", false);
 
-			OpenMeteoResponse response = new Gson().fromJson(json, OpenMeteoResponse.class);
+			OpenMeteoResponse response = parse(json);
 			if (response == null || response.hourly == null || response.hourly.time == null) {
 				throw new AfDataUpdateException("Failed to parse JSON or response was incomplete.");
 			}
@@ -225,7 +225,11 @@ public class AfOpenMeteoData implements AfDataSource {
 		}
 	}
 
-	private static Float get(List<Float> list, int i) {
+	static OpenMeteoResponse parse(String json) {
+		return new Gson().fromJson(json, OpenMeteoResponse.class);
+	}
+
+	static Float get(List<Float> list, int i) {
 		if (list == null || i >= list.size()) return null;
 		Float v = list.get(i);
 		return (v == null || v.isNaN()) ? null : v;
@@ -237,14 +241,14 @@ public class AfOpenMeteoData implements AfDataSource {
 
 	// DATA MODELS
 
-	private static class OpenMeteoResponse {
+	static class OpenMeteoResponse {
 		@SerializedName("timezone")
 		public String timezone;
 		@SerializedName("hourly")
 		public Hourly hourly;
 	}
 
-	private static class Hourly {
+	static class Hourly {
 		@SerializedName("time")
 		public List<Long> time;
 		@SerializedName("temperature_2m")
