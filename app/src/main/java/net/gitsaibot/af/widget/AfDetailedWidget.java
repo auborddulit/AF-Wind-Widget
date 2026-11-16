@@ -1461,9 +1461,8 @@ public class AfDetailedWidget {
 
 	private void drawWindLabels(Canvas canvas) {
 		float labelTextPaddingX = 2.5f * mDP;
-		float threshold = mWidgetSettings.getWindThreshold();
-		int windColor = mWidgetSettings.getWindColor();
-		int strongColor = mWidgetSettings.getWindStrongColor();
+		// Same color as the other labels of the widget
+		mWindLabelPaint.setColor(mWidgetSettings.getTextColor());
 
 		// Skip labels if they would overlap
 		double pixelsPerStep = mWindLabelStep / mWindScaleMax * mGraphRect.height();
@@ -1479,14 +1478,12 @@ public class AfDetailedWidget {
 		for (int i = every; i <= numSteps; i += every) {
 			double value = i * mWindLabelStep;
 			String label = Integer.toString((int) Math.round(value));
-			mWindLabelPaint.setColor(Math.abs(value - threshold) < 0.5 ? strongColor : windColor);
 			mWindLabelPaint.getTextBounds(label, 0, label.length(), bounds);
 			canvas.drawText(label,
 					mGraphRect.right + labelTextPaddingX,
 					windToY(value) - bounds.centerY(),
 					mWindLabelPaint);
 		}
-		mWindLabelPaint.setColor(windColor);
 	}
 
 	
