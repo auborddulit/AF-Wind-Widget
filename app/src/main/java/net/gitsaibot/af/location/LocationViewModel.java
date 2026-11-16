@@ -10,7 +10,6 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import net.gitsaibot.af.AfProvider.AfLocations;
 import net.gitsaibot.af.AfUtils;
-import net.gitsaibot.af.BuildConfig;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -29,7 +28,8 @@ public class LocationViewModel extends AndroidViewModel {
     private final MutableLiveData<List<AfAddress>> searchResults = new MutableLiveData<>();
     private final MutableLiveData<Integer> searchStatus = new MutableLiveData<>();
 
-    private static final List<String> geonamesDetailedNameComponents = List.of("name", "adminName5", "adminName4", "adminName3", "adminName2", "adminName1", "countryName");
+    // Open-Meteo geocoding (free, no account): https://open-meteo.com/en/docs/geocoding-api
+    private static final List<String> detailedNameComponents = List.of("name", "admin4", "admin3", "admin2", "admin1", "country");
 
     public final static int INVALID_INPUT = 0;
     public final static int NO_CONNECTION = 1;
@@ -98,39 +98,38 @@ public class LocationViewModel extends AndroidViewModel {
 
             try {
                 final int MAX_RESULTS = 7;
-                URI uri = new URI("https", "secure.geonames.org", "/searchJSON",
-                        "q=" + query.trim() +
-                                "&lang=" + Locale.getDefault().getLanguage() +
-                                "&maxRows=" + MAX_RESULTS +
-                                "&username=" + BuildConfig.USER_GEONAMES, null);
+                URI uri = new URI("https", "geocoding-api.open-meteo.com", "/v1/search",
+                        "name=" + query.trim() +
+                                "&count=" + MAX_RESULTS +
+                                "&language=" + Locale.getDefault().getLanguage() +
+                                "&format=json", null);
 
                 HttpURLConnection httpClient = AfUtils.setupHttpClient(uri.toURL(), getApplication());
                 InputStream content = AfUtils.getGzipInputStream(httpClient);
                 JSONObject jObject = new JSONObject(AfUtils.convertStreamToString(content));
 
-                if (jObject.has("status")) {
-                    int errorCode = jObject.getJSONObject("status").optInt("value", 0);
-                    searchStatus.postValue(SEARCH_ERROR + errorCode);
+                if (jObject.optBoolean("error", false)) {
+                    searchStatus.postValue(INVALID_REQUEST);
                     return;
                 }
 
-                List<AfAddress> addresses = new ArrayList<>();
-                JSONArray results = jObject.getJSONArray("geonames");
-                int numResults = Math.min(results.length(), MAX_RESULTS);
+                JSONArray results = jObject.optJSONArray("results");
+                int numResults = results != null ? Math.min(results.length(), MAX_RESULTS) : 0;
 
                 if (numResults <= 0) {
                     searchStatus.postValue(NO_RESULTS);
                     return;
                 }
 
+                List<AfAddress> addresses = new ArrayList<>();
                 for (int i = 0; i < numResults; i++) {
                     try {
                         JSONObject result = results.getJSONObject(i);
                         AfAddress address = new AfAddress();
                         address.title = result.getString("name");
                         address.title_detailed = buildTitleDetailed(result);
-                        address.latitude = result.getString("lat");
-                        address.longitude = result.getString("lng");
+                        address.latitude = Double.toString(result.getDouble("latitude"));
+                        address.longitude = Double.toString(result.getDouble("longitude"));
                         addresses.add(address);
                     } catch (Exception e) { /* ignore malformed results */ }
                 }
@@ -153,11 +152,12 @@ public class LocationViewModel extends AndroidViewModel {
     private static String buildTitleDetailed(final JSONObject result) {
         StringBuilder titleDetailedSb = new StringBuilder();
 
-        for (String key : geonamesDetailedNameComponents) {
+        for (String key : detailedNameComponents) {
             if (result.has(key)) {
                 String component = result.optString(key).trim();
 
-                if (!component.isEmpty()) {
+                boolean isDuplicate = titleDetailedSb.toString().endsWith(component);
+                if (!component.isEmpty() && !isDuplicate) {
                     if (titleDetailedSb.length() > 0) {
                         titleDetailedSb.append(", ");
                     }

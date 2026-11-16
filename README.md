@@ -1,28 +1,25 @@
-# AF Weather Widget
+# AF Wind Widget
 
-![af_weather_warm](https://user-images.githubusercontent.com/15521729/111474175-107efa80-872c-11eb-9dd9-11a55146fd31.png)
+Fork personnel de [AF Weather Widget](https://github.com/Gitsaibot/AF-Weather-Widget) : le même widget météo graphique pour Android, avec en plus le **vent moyen et les rafales** (km/h), et les prévisions des **modèles Météo-France** (AROME puis ARPEGE) via [Open-Meteo](https://open-meteo.com/).
 
+## Ce qui change par rapport à l'original
 
-#### Free, no ads and open source!
+- **Source météo** : Open-Meteo, modèles Météo-France (`meteofrance_seamless`) — gratuit, sans compte ni clé. MET Norway et NOAA restent disponibles dans les réglages.
+- **Vent** : courbe du vent moyen (trait plein) et des rafales (pointillés), échelle en km/h à droite du graphe.
+- **Seuil de vent fort** : au-dessus du seuil (40 km/h par défaut), les courbes changent de couleur et une ligne pointillée marque le seuil.
+- **Ligne du haut** : le vent actuel (« Vent 18 km/h (raf. 35) ») remplace la pression (MSLP).
+- **Nouveaux réglages** (Apparence → Vent) : afficher le vent, seuil, couleur du vent moyen, des rafales et au-dessus du seuil.
+- **Recherche de lieux et fuseaux horaires** : via Open-Meteo au lieu de GeoNames (plus besoin de compte GeoNames).
+- L'appli s'appelle « AF Wind » (`net.auborddulit.afwind`) et peut être installée à côté de l'original.
 
-[<img src="fastlane/metadata/en_fdroid.png" height="60" alt="Get it on F-Droid">](https://f-droid.org/en/packages/net.gitsaibot.af/)
+## Installer sur le téléphone
 
-This app is a fork of aix weather widget which is no longer actively developed. It is a compact graphical weather graph as a single row Android widget. The source code is made public domain as it may provide utility for others. Please respect the various APIs used by the app, and please modify the user agent if you are running a modified version of the app.
+À chaque modification, GitHub fabrique automatiquement l'APK : voir la page [Releases](https://github.com/auborddulit/AF-Wind-Widget/releases), télécharger le fichier `.apk` de la dernière version depuis le téléphone et l'ouvrir. Les nouvelles versions s'installent par-dessus l'ancienne en gardant les réglages.
 
-## Acknowledgements
+## Remerciements et licences
 
-* The Norwegian Meteorological Institute for providing an [open weather data API](https://api.met.no/#english).
-* The National Weather Service for providing an [open weather data API](https://graphical.weather.gov/xml/rest.php).
-* The GeoNames database for providing their [timezone and geoname API](http://www.geonames.org/export/web-services.html).
-* Thanks to [bharathp666 from DeviantArt](http://bharathp666.deviantart.com/) for the [application icon](http://bharathp666.deviantart.com/art/Android-Weather-Icons-180719113) (`app_icon.png`).
-
-## License
-
-* All code written as part of the app is licensed as [CC0 Universal](https://creativecommons.org/publicdomain/zero/1.0/). The only exceptions are `MultiKey.java` and `Pair.java` which are licensed under Apache 2.0 as specified in their headers.
-* The weather icons are owned by The Norwegian Meteorological Institute and are as provided via their [weathericon API](https://api.met.no/weatherapi/weathericon/2.0/documentation).
-
-## Information for use
-
-* Any use of the provided software must respect the terms of each API used.
-* [The user agent information must be changed if used in a modified application.](https://github.com/Gitsaibot/AF-Weather-Widget/blob/master/app/src/main/java/net/gitsaibot/af/AixUtils.java#L497)
-* [The GeoNames username must be changed if used in a modified application.](https://github.com/Gitsaibot/AF-Weather-Widget/blob/master/app/src/main/java/net/gitsaibot/af/data/AixGeoNamesData.java#L62)
+- Code d'origine : [AF Weather Widget](https://github.com/Gitsaibot/AF-Weather-Widget) par Gitsaibot, lui-même dérivé de aix weather widget — licence [CC0](https://creativecommons.org/publicdomain/zero/1.0/) (sauf `MultiKey.java` et `Pair.java`, Apache 2.0).
+- Données météo : [Open-Meteo](https://open-meteo.com/) (licence [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)), à partir des modèles de [Météo-France](https://meteofrance.com/).
+- Lever/coucher du soleil et de la lune : [Institut météorologique norvégien (MET Norway)](https://api.met.no/).
+- Icônes météo : propriété de MET Norway, via leur [API weathericon](https://api.met.no/weatherapi/weathericon/2.0/documentation).
+- Icône de l'application : [bharathp666 (DeviantArt)](http://bharathp666.deviantart.com/).

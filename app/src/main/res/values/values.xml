@@ -6,5 +6,7 @@
 	
 	<string name="precipitation_scaling_mm_default" translatable="false">1</string>
 	<string name="precipitation_scaling_inches_default" translatable="false">0.05</string>
+
+	<string name="wind_threshold_default" translatable="false">40</string>
 	
 </resources>

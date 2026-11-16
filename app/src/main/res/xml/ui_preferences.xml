@@ -155,4 +155,50 @@
                     android:persistent="true" />
 
         </PreferenceCategory>
+        <PreferenceCategory
+            android:title="@string/ui_settings_category_wind">
+
+                <CheckBoxPreference
+                    android:key="@string/wind_enabled_bool"
+                    android:title="@string/wind_enabled_title"
+                    android:layout="@layout/preference_title_checkbox"
+                    android:persistent="true"
+                    android:defaultValue="true"
+                    android:summaryOn="@string/wind_enabled_summary_on"
+                    android:summaryOff="@string/wind_enabled_summary_off" />
+
+                <EditTextPreference
+                    android:key="@string/wind_threshold_string"
+                    android:title="@string/wind_threshold_title"
+                    android:dialogTitle="@string/wind_threshold_title"
+                    android:layout="@layout/preference_title"
+                    android:dependency="@string/wind_enabled_bool"
+                    android:persistent="true"
+                    android:defaultValue="@string/wind_threshold_default"
+                    android:inputType="number"
+                    android:selectAllOnFocus="true"
+                    android:dialogLayout="@layout/edit_text_preference" />
+
+                <net.gitsaibot.af.ColorPreference
+                    android:key="@string/wind_color_int"
+                    android:title="@string/wind_color_title"
+                    android:dependency="@string/wind_enabled_bool"
+                    android:defaultValue="@color/wind"
+                    android:persistent="true" />
+
+                <net.gitsaibot.af.ColorPreference
+                    android:key="@string/gust_color_int"
+                    android:title="@string/gust_color_title"
+                    android:dependency="@string/wind_enabled_bool"
+                    android:defaultValue="@color/gust"
+                    android:persistent="true" />
+
+                <net.gitsaibot.af.ColorPreference
+                    android:key="@string/wind_strong_color_int"
+                    android:title="@string/wind_strong_color_title"
+                    android:dependency="@string/wind_enabled_bool"
+                    android:defaultValue="@color/wind_strong"
+                    android:persistent="true" />
+
+        </PreferenceCategory>
 </PreferenceScreen>

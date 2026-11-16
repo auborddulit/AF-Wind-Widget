@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
-    <string name="app_description">Weather widget showing detailed 24-hour forecasts in a 4x1 format.</string>
+    <string name="app_description">Weather widget showing detailed 24-hour forecasts with wind and gusts in a 4x1 format.</string>
 
-    <string name="widget_name" translatable="false">AF Weather</string>
+    <string name="widget_name" translatable="false">AF Wind</string>
     <string name="widget_loading">Loading AF...</string>
 
     <string name="device_profile_guide_link" translatable="false">&lt;a href=\"https://github.com/Gitsaibot/AF-Weather-Widget/wiki/Device-Profiles/\"&gt;Device Profile Guide&lt;/a&gt;</string>
@@ -280,5 +280,27 @@
 	<string name="calibrationDecrementSymbol" translatable="false">\u2212</string>
 
 	<string name="bufferImageFileName" translatable="false">af_%1$d_%2$d_%3$s.png</string>
+
+	<!-- AF Wind Widget: wind and gusts -->
+	<string name="wind_enabled_bool" translatable="false">wind_enabled_bool</string>
+	<string name="wind_threshold_string" translatable="false">wind_threshold_string</string>
+	<string name="wind_color_int" translatable="false">wind_color_int</string>
+	<string name="gust_color_int" translatable="false">gust_color_int</string>
+	<string name="wind_strong_color_int" translatable="false">wind_strong_color_int</string>
+
+	<string name="ui_settings_category_wind">Vent</string>
+	<string name="wind_enabled_title">Afficher le vent</string>
+	<string name="wind_enabled_summary_on">Courbes de vent et de rafales affichées</string>
+	<string name="wind_enabled_summary_off">Vent masqué</string>
+	<string name="wind_threshold_title">Seuil de vent fort</string>
+	<string name="wind_threshold_summary">%1$s km/h</string>
+	<string name="wind_threshold_invalid_number_toast">Le seuil doit être un nombre.</string>
+	<string name="wind_threshold_invalid_range_toast">Le seuil doit être compris entre 1 et 200 km/h.</string>
+	<string name="wind_color_title">Couleur vent moyen</string>
+	<string name="gust_color_title">Couleur rafales</string>
+	<string name="wind_strong_color_title">Couleur au-dessus du seuil</string>
+	<string name="wind_top">Vent %1$d km/h (raf. %2$d)</string>
+	<string name="wind_top_short">Vent %1$d/%2$d</string>
+	<string name="wind_top_no_gust">Vent %1$d km/h</string>
 
 </resources>

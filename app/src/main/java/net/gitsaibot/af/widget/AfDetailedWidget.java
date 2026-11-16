@@ -42,6 +42,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.BitmapShader;
 import android.graphics.Canvas;
+import android.graphics.DashPathEffect;
 import android.graphics.LinearGradient;
 import android.graphics.Matrix;
 import android.graphics.Paint;
@@ -111,6 +112,14 @@ public class AfDetailedWidget {
 	private Paint mTextPaint;
 	
 	private Paint mMinRainPaint, mMaxRainPaint;
+	
+	/* Wind (AF Wind Widget) */
+	private Paint mWindPaint, mWindStrongPaint, mGustPaint, mGustStrongPaint;
+	private Paint mWindThresholdPaint, mWindLabelPaint;
+	private boolean mDrawWind;
+	private double mWindScaleMax;
+	private double mWindLabelStep;
+	private float mRightLabelWidth;
 	
 	private TimeZone mUtcTimeZone = TimeZone.getTimeZone("UTC");
 	
@@ -216,6 +225,8 @@ public class AfDetailedWidget {
         double reservedSpaceAboveGraph = mIconHeight + mIconSpacingY;
         double reservedSpaceBelowGraph = 2.0f * mDP * scaleFactor;
 
+        setupWindScale();
+
         calculateDimensions(isLandscape, drawTopText, minimumCellWidth, minimumCellHeight, reservedSpaceAboveGraph, reservedSpaceBelowGraph);
 
         drawBackground(canvas);
@@ -230,6 +241,10 @@ public class AfDetailedWidget {
         buildRainPaths(minRainPath, maxRainPath);
         drawRainPaths(canvas, minRainPath, maxRainPath);
 
+        if (mDrawWind) {
+            drawWind(canvas);
+        }
+
         PointF[] temperaturePointArray = buildTemperaturePointArray(mPointData, mTimeFrom, mTimeTo, (float)mTemperatureRangeMax, (float)mTemperatureRangeMin);
         Path temperaturePath = CatmullRomSpline.buildPath(temperaturePointArray);
 
@@ -241,11 +256,15 @@ public class AfDetailedWidget {
 
         drawGridOutline(canvas);
         drawTemperatureLabels(canvas);
+        if (mDrawWind) {
+            drawWindLabels(canvas);
+        }
         drawHourLabels(canvas);
         drawWeatherIcons(canvas);
 
         if (drawTopText) {
             Float pressure = null, humidity = null, temperature = null;
+            Float windSpeed = null, windGust = null;
 
             long error = Long.MAX_VALUE;
 
@@ -260,11 +279,17 @@ public class AfDetailedWidget {
                         pressure = p.pressure;
                         humidity = p.humidity;
                         temperature = p.temperature;
+                        windSpeed = p.windSpeed;
+                        windGust = p.windGust;
                         error = e;
                     }
                 }
             }
-            drawInfoText(canvas, pressure, humidity, temperature);
+            if (!mDrawWind) {
+                windSpeed = null;
+                windGust = null;
+            }
+            drawInfoText(canvas, pressure, humidity, temperature, windSpeed, windGust);
         }
         return bitmap;
     }
@@ -520,7 +545,7 @@ public class AfDetailedWidget {
 		
 		graphRect.left = (int) Math.round((double)parentRect.left + verticalLabelWidth + 5.0 * (double)mDP);
 		graphRect.top = (int) Math.round((double)parentRect.top + topSpacing);
-		graphRect.right = (int) Math.round((double)parentRect.right - 5.0 * (double)mDP);
+		graphRect.right = (int) Math.round((double)parentRect.right - 5.0 * (double)mDP - mRightLabelWidth);
 		graphRect.bottom = (int) Math.round((double)parentRect.bottom - horizontalLabelHeight - 6.0 * (double)mDP);
 		
 		// Sanity check
@@ -793,13 +818,22 @@ public class AfDetailedWidget {
 		}
 	}
 
-	private void drawInfoText(Canvas canvas, Float pressure, Float humidity, Float temperature)
+	private void drawInfoText(Canvas canvas, Float pressure, Float humidity, Float temperature, Float windSpeed, Float windGust)
 	{
 		float topTextSidePadding = mDP;
 		
 		String locationName = mAfLocationInfo.getTitle();
 		
-		String pressureString = pressure != null ? mContext.getString(R.string.pressure_top, pressure) : "";
+		// When wind is shown, the current wind replaces the sea level pressure (MSLP).
+		boolean showWind = windSpeed != null;
+		String pressureString;
+		if (showWind) {
+			pressureString = windGust != null
+					? mContext.getString(R.string.wind_top, Math.round(windSpeed), Math.round(windGust))
+					: mContext.getString(R.string.wind_top_no_gust, Math.round(windSpeed));
+		} else {
+			pressureString = pressure != null ? mContext.getString(R.string.pressure_top, pressure) : "";
+		}
 		String humidityString = humidity != null ? mContext.getString(R.string.humidity_top, humidity) : "";
 		
 		float precipitationScale = mWidgetSettings.getPrecipitationScaling();
@@ -846,7 +880,13 @@ public class AfDetailedWidget {
 		{
 			switch (measureState) {
 			case 0:
-				if (pressure != null)
+				if (showWind)
+				{
+					if (windGust != null) {
+						pressureString = mContext.getString(R.string.wind_top_short, Math.round(windSpeed), Math.round(windGust));
+					}
+				}
+				else if (pressure != null)
 				{
 					pressureString = mContext.getString(R.string.pressure_top_short, pressure);
 				}
@@ -1290,7 +1330,165 @@ public class AfDetailedWidget {
 			setStrokeCap(Paint.Cap.SQUARE);
 			setStyle(Paint.Style.STROKE);
 		}};
+
+		final int windColor = mWidgetSettings.getWindColor();
+		final int gustColor = mWidgetSettings.getGustColor();
+		final int strongColor = mWidgetSettings.getWindStrongColor();
+
+		mWindPaint = buildLinePaint(windColor);
+		mWindStrongPaint = buildLinePaint(strongColor);
+		mGustPaint = buildLinePaint(gustColor);
+		mGustStrongPaint = buildLinePaint(strongColor);
+		mWindThresholdPaint = buildLinePaint((strongColor & 0x00FFFFFF) | 0x99000000);
+		mWindThresholdPaint.setStrokeCap(Paint.Cap.BUTT);
+		mWindLabelPaint = new Paint();
+		mWindLabelPaint.setAntiAlias(true);
+		mWindLabelPaint.setColor(windColor);
 	}
+
+	private static Paint buildLinePaint(int color) {
+		Paint paint = new Paint();
+		paint.setAntiAlias(true);
+		paint.setColor(color);
+		paint.setStrokeCap(Paint.Cap.ROUND);
+		paint.setStrokeJoin(Paint.Join.ROUND);
+		paint.setStyle(Paint.Style.STROKE);
+		return paint;
+	}
+
+	/**
+	 * Decides whether wind can be drawn and picks the km/h scale shown on the right side.
+	 * Must be called after the label text size is known and before calculateDimensions().
+	 */
+	private void setupWindScale() {
+		mDrawWind = false;
+		mRightLabelWidth = 0.0f;
+
+		if (!mWidgetSettings.drawWind()) return;
+
+		double maxValue = 0.0;
+		int numSamples = 0;
+		for (PointData p : mPointData) {
+			if (p.time == null || p.time < mTimeFrom || p.time > mTimeTo) continue;
+			if (p.windSpeed != null) {
+				maxValue = Math.max(maxValue, p.windSpeed);
+				numSamples++;
+			}
+			if (p.windGust != null) {
+				maxValue = Math.max(maxValue, p.windGust);
+			}
+		}
+
+		if (numSamples < 3) return; // No wind data (e.g. a source without wind)
+
+		double threshold = mWidgetSettings.getWindThreshold();
+		double top = Math.max(20.0, Math.max(maxValue * 1.1, threshold * 1.25));
+
+		double[] steps = { 5.0, 10.0, 20.0, 25.0, 50.0, 100.0 };
+		double step = steps[steps.length - 1];
+		for (double s : steps) {
+			if (top / s <= 4.0) {
+				step = s;
+				break;
+			}
+		}
+
+		mWindLabelStep = step;
+		mWindScaleMax = Math.ceil(top / step) * step;
+
+		String widestLabel = Integer.toString((int) Math.round(mWindScaleMax));
+		mRightLabelWidth = mWindLabelPaint.measureText(widestLabel) + 3.0f * mDP;
+		mDrawWind = true;
+	}
+
+	private Path buildWindPath(boolean gusts) {
+		ArrayList<PointF> points = new ArrayList<>();
+		float timeRange = (float) (mTimeTo - mTimeFrom);
+
+		for (PointData p : mPointData) {
+			Float value = gusts ? p.windGust : p.windSpeed;
+			if (p.time == null || value == null) continue;
+			float x = (float) (p.time - mTimeFrom) / timeRange;
+			float y = 1.0f - (float) (Math.max(0.0f, value) / mWindScaleMax);
+			points.add(new PointF(x, y));
+		}
+
+		Path path = CatmullRomSpline.buildPath(points.toArray(new PointF[0]));
+
+		Matrix scaleMatrix = new Matrix();
+		scaleMatrix.setScale(mGraphRect.width(), mGraphRect.height());
+		path.transform(scaleMatrix);
+		path.offset(mGraphRect.left, mGraphRect.top);
+		return path;
+	}
+
+	private float windToY(double value) {
+		return (float) (mGraphRect.bottom - value / mWindScaleMax * mGraphRect.height());
+	}
+
+	private void drawWind(Canvas canvas) {
+		float threshold = mWidgetSettings.getWindThreshold();
+		float thresholdY = windToY(threshold);
+		thresholdY = Math.max(mGraphRect.top, Math.min(mGraphRect.bottom, thresholdY));
+
+		RectF inner = new RectF(mGraphRect.left + 1, mGraphRect.top, mGraphRect.right, mGraphRect.bottom);
+
+		// Dotted line marking the strong wind threshold
+		if (threshold < mWindScaleMax) {
+			Path thresholdPath = new Path();
+			thresholdPath.moveTo(inner.left, thresholdY);
+			thresholdPath.lineTo(inner.right, thresholdY);
+			canvas.drawPath(thresholdPath, mWindThresholdPaint);
+		}
+
+		Path gustPath = buildWindPath(true);
+		Path windPath = buildWindPath(false);
+
+		// Below the threshold: normal colors
+		canvas.save();
+		canvas.clipRect(inner.left, thresholdY, inner.right, inner.bottom);
+		canvas.drawPath(gustPath, mGustPaint);
+		canvas.drawPath(windPath, mWindPaint);
+		canvas.restore();
+
+		// Above the threshold: strong wind color
+		canvas.save();
+		canvas.clipRect(inner.left, inner.top, inner.right, thresholdY);
+		canvas.drawPath(gustPath, mGustStrongPaint);
+		canvas.drawPath(windPath, mWindStrongPaint);
+		canvas.restore();
+	}
+
+	private void drawWindLabels(Canvas canvas) {
+		float labelTextPaddingX = 2.5f * mDP;
+		float threshold = mWidgetSettings.getWindThreshold();
+		int windColor = mWidgetSettings.getWindColor();
+		int strongColor = mWidgetSettings.getWindStrongColor();
+
+		// Skip labels if they would overlap
+		double pixelsPerStep = mWindLabelStep / mWindScaleMax * mGraphRect.height();
+		int every = 1;
+		while (every * pixelsPerStep < mWindLabelPaint.getTextSize() * 1.2f && every < 10) {
+			every++;
+		}
+
+		mWindLabelPaint.setTextAlign(Paint.Align.LEFT);
+		Rect bounds = new Rect();
+
+		int numSteps = (int) Math.round(mWindScaleMax / mWindLabelStep);
+		for (int i = every; i <= numSteps; i += every) {
+			double value = i * mWindLabelStep;
+			String label = Integer.toString((int) Math.round(value));
+			mWindLabelPaint.setColor(Math.abs(value - threshold) < 0.5 ? strongColor : windColor);
+			mWindLabelPaint.getTextBounds(label, 0, label.length(), bounds);
+			canvas.drawText(label,
+					mGraphRect.right + labelTextPaddingX,
+					windToY(value) - bounds.centerY(),
+					mWindLabelPaint);
+		}
+		mWindLabelPaint.setColor(windColor);
+	}
+
 	
 	private void setupSunMoonData() {
 		Calendar calendar = Calendar.getInstance(mUtcTimeZone);
@@ -1484,6 +1682,19 @@ public class AfDetailedWidget {
         mAboveFreezingTemperaturePaint.setStrokeWidth(2.0f * mDP * scaleFactor);
         mBelowFreezingTemperaturePaint.setStrokeWidth(2.0f * mDP * scaleFactor);
         mMaxRainPaint.setStrokeWidth(Math.max(1.0f, mDP * scaleFactor));
+
+        // Wind lines are half the thickness of the temperature line
+        float windStroke = Math.max(1.0f, 1.0f * mDP * scaleFactor);
+        mWindPaint.setStrokeWidth(windStroke);
+        mWindStrongPaint.setStrokeWidth(windStroke);
+        mGustPaint.setStrokeWidth(windStroke);
+        mGustStrongPaint.setStrokeWidth(windStroke);
+        DashPathEffect gustDash = new DashPathEffect(new float[] { 4.0f * mDP * scaleFactor, 3.0f * mDP * scaleFactor }, 0.0f);
+        mGustPaint.setPathEffect(gustDash);
+        mGustStrongPaint.setPathEffect(gustDash);
+        mWindThresholdPaint.setStrokeWidth(Math.max(1.0f, 0.75f * mDP * scaleFactor));
+        mWindThresholdPaint.setPathEffect(new DashPathEffect(new float[] { 1.5f * mDP * scaleFactor, 3.0f * mDP * scaleFactor }, 0.0f));
+        mWindLabelPaint.setTextSize(mLabelTextSize);
     }
 
 	private void setupWidgetDimensions(int width, int height) {

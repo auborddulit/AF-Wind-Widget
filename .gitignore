@@ -86,3 +86,5 @@ lint/tmp/
 ### Android Patch ###
 gen-external-apklibs
 output.json
+# AF Wind Widget: the app signing key is intentionally kept in the repository
+!signing/afwind-release.keystore

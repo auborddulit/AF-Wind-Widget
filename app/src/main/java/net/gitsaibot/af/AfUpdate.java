@@ -21,10 +21,11 @@ import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkManager;
 
 import net.gitsaibot.af.data.AfDataUpdateException;
-import net.gitsaibot.af.data.AfGeoNamesData;
 import net.gitsaibot.af.data.AfMetSunTimeData;
 import net.gitsaibot.af.data.AfMetWeatherData;
 import net.gitsaibot.af.data.AfNoaaWeatherData;
+import net.gitsaibot.af.data.AfOpenMeteoData;
+import net.gitsaibot.af.data.AfTimeZoneData;
 import net.gitsaibot.af.util.AfLocationInfo;
 import net.gitsaibot.af.util.AfViewInfo;
 import net.gitsaibot.af.util.AfWidgetInfo;
@@ -361,15 +362,18 @@ public class AfUpdate {
         Log.d(TAG, "updateData() started uri=" + afLocationInfo.getLocationUri());
 
         AfUtils.clearOldProviderData(mContext.getContentResolver());
-        AfGeoNamesData.build(mContext, this, mAfSettings).update(afLocationInfo, mCurrentUtcTime);
+        AfTimeZoneData.build(mContext, this).update(afLocationInfo, mCurrentUtcTime);
         AfMetSunTimeData.build(mContext, this).update(afLocationInfo, mCurrentUtcTime);
 
         int provider = mAfSettings.getCachedProvider();
 
-        if ((provider == AfUtils.PROVIDER_AUTO && isLocationInUS(afLocationInfo)) || provider == AfUtils.PROVIDER_NWS) {
+        if (provider == AfUtils.PROVIDER_NWS) {
             AfNoaaWeatherData.build(mContext, this).update(afLocationInfo, mCurrentUtcTime);
-        } else {
+        } else if (provider == AfUtils.PROVIDER_NMET) {
             AfMetWeatherData.build(mContext, this).update(afLocationInfo, mCurrentUtcTime);
+        } else {
+            // Auto and Open-Meteo: Météo-France models through Open-Meteo (includes wind gusts)
+            AfOpenMeteoData.build(mContext, this).update(afLocationInfo, mCurrentUtcTime);
         }
     }
 

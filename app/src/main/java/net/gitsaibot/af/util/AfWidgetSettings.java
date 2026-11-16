@@ -31,6 +31,7 @@ public class AfWidgetSettings {
 		mFloatKeys.add(context.getString(R.string.precipitation_scaling_string));
 		mFloatKeys.add(context.getString(R.string.border_thickness_string));
 		mFloatKeys.add(context.getString(R.string.border_rounding_string));
+		mFloatKeys.add(context.getString(R.string.wind_threshold_string));
 		
 		mIntegerKeys.add(context.getString(R.string.temperature_units_string));
 		mIntegerKeys.add(context.getString(R.string.precipitation_units_string));
@@ -91,6 +92,7 @@ public class AfWidgetSettings {
 		
 		settings.put(context.getString(R.string.day_effect_bool), Boolean.TRUE);
 		settings.put(context.getString(R.string.border_enabled_bool), Boolean.TRUE);
+		settings.put(context.getString(R.string.wind_enabled_bool), Boolean.TRUE);
 		
 		AfWidgetSettings afWidgetSettings = new AfWidgetSettings(context);
 		afWidgetSettings.mSettings = settings;
@@ -169,6 +171,7 @@ public class AfWidgetSettings {
 		int[][] defaultFloats = {
 				{ R.string.border_thickness_string, R.string.border_thickness_default },
 				{ R.string.border_rounding_string, R.string.border_rounding_default },
+				{ R.string.wind_threshold_string, R.string.wind_threshold_default },
 				{ R.string.precipitation_scaling_string,
 						useInches() ? R.string.precipitation_scaling_inches_default
 									: R.string.precipitation_scaling_mm_default } };
@@ -200,7 +203,10 @@ public class AfWidgetSettings {
 				{ R.string.max_rain_color_int, R.color.maximum_rain },
 				{ R.string.min_rain_color_int, R.color.minimum_rain },
 				{ R.string.above_freezing_color_int, R.color.above_freezing },
-				{ R.string.below_freezing_color_int, R.color.below_freezing } };
+				{ R.string.below_freezing_color_int, R.color.below_freezing },
+				{ R.string.wind_color_int, R.color.wind },
+				{ R.string.gust_color_int, R.color.gust },
+				{ R.string.wind_strong_color_int, R.color.wind_strong } };
 
 		for (int[] defaultColor : defaultColors) {
 			String key = r.getString(defaultColor[0]);
@@ -359,6 +365,37 @@ public class AfWidgetSettings {
 	public int getBelowFreezingColor() {
 		Integer color = getIntegerSetting(mContext.getString(R.string.below_freezing_color_int));
 		if (color == null) color = ContextCompat.getColor(mContext, R.color.below_freezing);
+		return color;
+	}
+
+	public boolean drawWind() {
+		Boolean value = getBooleanSetting(mContext.getString(R.string.wind_enabled_bool));
+		if (value == null) value = true;
+		return value;
+	}
+
+	/** Strong wind threshold in km/h. */
+	public float getWindThreshold() {
+		Float value = getFloatSetting(mContext.getString(R.string.wind_threshold_string));
+		if (value == null || value <= 0.0f) value = 40.0f;
+		return value;
+	}
+
+	public int getWindColor() {
+		Integer color = getIntegerSetting(mContext.getString(R.string.wind_color_int));
+		if (color == null) color = ContextCompat.getColor(mContext, R.color.wind);
+		return color;
+	}
+
+	public int getGustColor() {
+		Integer color = getIntegerSetting(mContext.getString(R.string.gust_color_int));
+		if (color == null) color = ContextCompat.getColor(mContext, R.color.gust);
+		return color;
+	}
+
+	public int getWindStrongColor() {
+		Integer color = getIntegerSetting(mContext.getString(R.string.wind_strong_color_int));
+		if (color == null) color = ContextCompat.getColor(mContext, R.color.wind_strong);
 		return color;
 	}
 	

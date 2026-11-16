@@ -66,6 +66,7 @@ public class AfUtils {
 	public final static int PROVIDER_AUTO = 1;
 	public final static int PROVIDER_NMET = 2;
 	public final static int PROVIDER_NWS = 3;
+	public final static int PROVIDER_OPENMETEO = 4;
 
 	public static final int PI_FLAG_IMMUTABLE = PendingIntent.FLAG_IMMUTABLE;
 
@@ -531,7 +532,7 @@ public class AfUtils {
 	{
 		StringBuilder userAgent = new StringBuilder();
 		
-		userAgent.append("AF Weather Widget");
+		userAgent.append("AF Wind Widget");
 
 		try {
 			PackageInfo pInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
@@ -542,7 +543,7 @@ public class AfUtils {
 			e.printStackTrace();
 		}
 		
-		userAgent.append("https://github.com/Gitsaibot/AF-Weather-Widget;" + BuildConfig.USER_AGENT);
+		userAgent.append(" (https://github.com/auborddulit/AF-Wind-Widget; " + BuildConfig.USER_AGENT + ")");
 
 		return userAgent.toString();
 	}

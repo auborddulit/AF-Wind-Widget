@@ -50,7 +50,7 @@
 	</string-array>
 	
 	<string-array name="provider_readable">
-		<item>Auto</item>
+		<item>Auto (Météo-France via Open-Meteo)</item>
 		<item>Norwegian Meteorological Institute</item>
 		<item>NOAA NWS (US)</item>
 	</string-array>

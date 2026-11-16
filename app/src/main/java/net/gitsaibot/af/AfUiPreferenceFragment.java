@@ -18,6 +18,7 @@ public class AfUiPreferenceFragment extends PreferenceFragmentCompat implements
 
     private EditTextPreference mBorderThicknessPreference;
     private EditTextPreference mBorderRoundingPreference;
+    private EditTextPreference mWindThresholdPreference;
 
     @Override
     public void onCreatePreferences(Bundle bundle, String s) {
@@ -31,11 +32,16 @@ public class AfUiPreferenceFragment extends PreferenceFragmentCompat implements
         mBorderThicknessPreference.setOnPreferenceChangeListener(this);
         mBorderRoundingPreference.setOnPreferenceChangeListener(this);
 
+        mWindThresholdPreference = findPreference(getString(R.string.wind_threshold_string));
+        mWindThresholdPreference.setOnPreferenceChangeListener(this);
+
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(requireContext());
         String bts = pref.getString(getString(R.string.border_thickness_string), "5");
         mBorderThicknessPreference.setSummary(bts + "px");
         String brs = pref.getString(getString(R.string.border_rounding_string), "4");
         mBorderRoundingPreference.setSummary(brs + "px");
+        String wts = pref.getString(getString(R.string.wind_threshold_string), getString(R.string.wind_threshold_default));
+        mWindThresholdPreference.setSummary(getString(R.string.wind_threshold_summary, wts));
 
         getParentFragmentManager().setFragmentResultListener("COLOR_RESULT_KEY", this, new FragmentResultListener() {
             @Override
@@ -71,6 +77,23 @@ public class AfUiPreferenceFragment extends PreferenceFragmentCompat implements
             return onFloatPreferenceChange(preference, newValue, 0.0f, 20.0f,
                     R.string.border_rounding_invalid_number_toast,
                     R.string.border_rounding_invalid_range_toast);
+
+        } else if (preference == mWindThresholdPreference) {
+
+            float f;
+            try {
+                f = Float.parseFloat((String)newValue);
+            } catch (NumberFormatException e) {
+                Toast.makeText(getContext(), getString(R.string.wind_threshold_invalid_number_toast), Toast.LENGTH_SHORT).show();
+                return false;
+            }
+            if (f >= 1.0f && f <= 200.0f) {
+                preference.setSummary(getString(R.string.wind_threshold_summary, (String)newValue));
+                return true;
+            } else {
+                Toast.makeText(getContext(), getString(R.string.wind_threshold_invalid_range_toast), Toast.LENGTH_SHORT).show();
+                return false;
+            }
         }
         return false;
     }

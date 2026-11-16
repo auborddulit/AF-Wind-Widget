@@ -17,24 +17,47 @@ fun getKey(key: String): String {
     }
 }
 
+// Build number from GitHub Actions, so every new APK installs as an update
+val buildNumber = (System.getenv("GITHUB_RUN_NUMBER") ?: "0").toInt()
+
+// Signing key: kept in signing/ so every build is signed the same way (updates install over the old version)
+val signingProperties = Properties().apply {
+    val f = rootProject.file("signing/keystore.properties")
+    if (f.exists()) FileInputStream(f).use { load(it) }
+}
+val signingKeystoreFile = rootProject.file("signing/afwind-release.keystore")
+
 android {
     namespace = "net.gitsaibot.af"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "net.gitsaibot.af"
+        applicationId = "net.auborddulit.afwind"
         minSdk = 29
         targetSdk = 36
-        versionCode = 23
-        versionName = "3.2"
+        versionCode = 100 + buildNumber
+        versionName = "1.0.$buildNumber"
         buildConfigField("String", "USER_AGENT", "\"" + getKey("user_agent") + "\"")
         buildConfigField("String", "API_KEY", "\"" + getKey("apiKey") + "\"")
         buildConfigField("String", "USER_GEONAMES", "\"" + getKey("user_geonames") + "\"")
         multiDexEnabled = true
     }
 
+    signingConfigs {
+        create("release") {
+            if (signingKeystoreFile.exists()) {
+                storeFile = signingKeystoreFile
+                storePassword = signingProperties.getProperty("storePassword")
+                keyAlias = signingProperties.getProperty("keyAlias")
+                keyPassword = signingProperties.getProperty("keyPassword")
+            }
+        }
+    }
+
     buildTypes {
         release {
+            signingConfig = if (signingKeystoreFile.exists()) signingConfigs.getByName("release")
+                            else signingConfigs.getByName("debug")
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
