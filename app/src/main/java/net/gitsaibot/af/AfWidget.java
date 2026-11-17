@@ -52,33 +52,28 @@ public class AfWidget extends AppWidgetProvider {
         final int landW_px = (int)(maxWidth * density);
         final int landH_px = (int)(minHeight * density);
 
-        final PendingResult result = goAsync();
+        // Only the size is saved here. Redrawing directly from this callback raced with the
+        // calibration screen and the scheduled updates (flicker), and some launchers call it
+        // again after every redraw.
+        AfSettings settingsProbe = null;
+        try {
+            Uri widgetUri = ContentUris.withAppendedId(AfWidgets.CONTENT_URI, appWidgetId);
+            AfWidgetInfo widgetInfo = AfWidgetInfo.build(context, widgetUri);
+            widgetInfo.loadSettings(context);
+            settingsProbe = AfSettings.build(context, widgetInfo);
+            settingsProbe.loadSettings();
 
-        new Thread(() -> {
-            try {
-                net.gitsaibot.af.AfSettings.saveExactDimensions(context, appWidgetId, portW_px, portH_px, landW_px, landH_px);
+            boolean sizeChanged = !AfSettings.hasExactDimensions(context, appWidgetId, portW_px, portH_px, landW_px, landH_px);
+            AfSettings.saveExactDimensions(context, appWidgetId, portW_px, portH_px, landW_px, landH_px);
 
-                Uri widgetUri = ContentUris.withAppendedId(net.gitsaibot.af.AfProvider.AfWidgets.CONTENT_URI, appWidgetId);
+            boolean calibrating = settingsProbe.getCalibrationTarget() == appWidgetId;
+            boolean usesCalibratedSize = settingsProbe.getCachedUseSpecificDimensions();
 
-                AfWidgetInfo widgetInfo = AfWidgetInfo.build(context, widgetUri);
-                widgetInfo.loadSettings(context);
-
-                AfSettings settings = AfSettings.build(context, widgetInfo);
-                settings.loadSettings();
-
-                // While this widget is being calibrated, do not redraw it over the calibration screen
-                if (settings.getCalibrationTarget() == appWidgetId) {
-                    return;
-                }
-
-                AfUpdate update = AfUpdate.build(context, widgetInfo, settings);
-                update.process();
-
-            } catch (Exception e) {
-                e.printStackTrace();
-            } finally {
-                result.finish();
+            if (sizeChanged && !calibrating && !usesCalibratedSize) {
+                AfWorkManager.enqueueWork(context, new Intent(AfWorker.ACTION_UPDATE_WIDGET).setData(widgetUri));
             }
-        }).start();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

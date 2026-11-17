@@ -1073,6 +1073,14 @@ public class AfSettings {
         editor.apply();
     }
 
+    public static boolean hasExactDimensions(Context context, int appWidgetId, int portW, int portH, int landW, int landH) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        return prefs.getInt("exact_port_w_" + appWidgetId, -1) == portW
+                && prefs.getInt("exact_port_h_" + appWidgetId, -1) == portH
+                && prefs.getInt("exact_land_w_" + appWidgetId, -1) == landW
+                && prefs.getInt("exact_land_h_" + appWidgetId, -1) == landH;
+    }
+
     public Point getExactDimensions(int appWidgetId, boolean isLandscape) {
         String prefix = isLandscape ? "exact_land_" : "exact_port_";
         int w = mSharedPreferences.getInt(prefix + "w_" + appWidgetId, -1);
