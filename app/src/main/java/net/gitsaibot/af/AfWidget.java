@@ -66,6 +66,11 @@ public class AfWidget extends AppWidgetProvider {
                 AfSettings settings = AfSettings.build(context, widgetInfo);
                 settings.loadSettings();
 
+                // While this widget is being calibrated, do not redraw it over the calibration screen
+                if (settings.getCalibrationTarget() == appWidgetId) {
+                    return;
+                }
+
                 AfUpdate update = AfUpdate.build(context, widgetInfo, settings);
                 update.process();
 

@@ -9,7 +9,7 @@
 			android:id="@+id/widgetImagePortrait"
 			android:layout_width="match_parent"
 			android:layout_height="match_parent"
-			android:scaleType="fitXY"
+			android:scaleType="fitCenter"
 			android:visibility="gone"
 			android:contentDescription="@string/contentDescriptionPortraitImage" />
 
@@ -17,7 +17,7 @@
 			android:id="@+id/widgetImageLandscape"
 			android:layout_width="match_parent"
 			android:layout_height="match_parent"
-			android:scaleType="fitXY"
+			android:scaleType="fitCenter"
 			android:visibility="visible"
 			android:contentDescription="@string/contentDescriptionLandscapeImage" />
 

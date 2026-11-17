@@ -259,11 +259,12 @@ public class AfUpdate {
 
         Point exactDimensions = mAfSettings.getExactDimensions(mAfWidgetInfo.getAppWidgetId(), isLandscape);
 
-        if (exactDimensions != null) {
-            dimensions = exactDimensions;
-        }
-        else if (mAfSettings.getCachedUseSpecificDimensions()) {
+        if (mAfSettings.getCachedUseSpecificDimensions()) {
+            // Manual calibration (device profile) wins over the size reported by the launcher
             dimensions = mAfSettings.getPixelDimensionsOrStandard(isLandscape);
+        }
+        else if (exactDimensions != null) {
+            dimensions = exactDimensions;
         } else {
             dimensions = mAfSettings.getStandardPixelDimensions(mAfWidgetInfo.getNumColumns(), mAfWidgetInfo.getNumRows(), isLandscape, true);
         }
