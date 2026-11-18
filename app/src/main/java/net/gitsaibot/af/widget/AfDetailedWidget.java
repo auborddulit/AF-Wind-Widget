@@ -1398,6 +1398,17 @@ public class AfDetailedWidget {
 		} else if (style == AfWidgetSettings.ICON_STYLE_MATERIAL) {
 			mDayIcons = AfIconSets.MATERIAL_DAY;
 			mNightIcons = AfIconSets.MATERIAL_NIGHT;
+		} else if (style == AfWidgetSettings.ICON_STYLE_METEOCONS_FLAT
+				|| style == AfWidgetSettings.ICON_STYLE_METEOCONS_LINE) {
+			// Color sets: drawn as they are, not tinted
+			boolean flat = style == AfWidgetSettings.ICON_STYLE_METEOCONS_FLAT;
+			mDayIcons = flat ? AfIconSets.METEOCONS_FLAT_DAY : AfIconSets.METEOCONS_LINE_DAY;
+			mNightIcons = flat ? AfIconSets.METEOCONS_FLAT_NIGHT : AfIconSets.METEOCONS_LINE_NIGHT;
+			mPolarIcons = mNightIcons;
+			mIconPaint = new Paint();
+			mIconPaint.setAntiAlias(true);
+			mIconPaint.setFilterBitmap(true);
+			return;
 		} else {
 			mDayIcons = WEATHER_ICONS_DAY;
 			mNightIcons = WEATHER_ICONS_NIGHT;

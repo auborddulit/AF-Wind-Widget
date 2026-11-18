@@ -22,5 +22,9 @@ public class AfIconSetsTest {
 		assertCovers("Meteocons night", AfUtils.WEATHER_ICONS_NIGHT, AfIconSets.METEOCONS_NIGHT);
 		assertCovers("Material day", AfUtils.WEATHER_ICONS_DAY, AfIconSets.MATERIAL_DAY);
 		assertCovers("Material night", AfUtils.WEATHER_ICONS_NIGHT, AfIconSets.MATERIAL_NIGHT);
+		assertCovers("Meteocons Flat day", AfUtils.WEATHER_ICONS_DAY, AfIconSets.METEOCONS_FLAT_DAY);
+		assertCovers("Meteocons Flat night", AfUtils.WEATHER_ICONS_NIGHT, AfIconSets.METEOCONS_FLAT_NIGHT);
+		assertCovers("Meteocons Line day", AfUtils.WEATHER_ICONS_DAY, AfIconSets.METEOCONS_LINE_DAY);
+		assertCovers("Meteocons Line night", AfUtils.WEATHER_ICONS_NIGHT, AfIconSets.METEOCONS_LINE_NIGHT);
 	}
 }

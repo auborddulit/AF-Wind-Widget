@@ -1,6 +1,6 @@
 package net.gitsaibot.af;
 
-/** Monochrome weather icon sets (generated). Index = MET Norway symbol code - 1. */
+/** Extra weather icon sets, generated from SVG (monochrome ones are tinted when drawn). Index = MET Norway symbol code - 1. */
 public final class AfIconSets {
 
 	private AfIconSets() { }
@@ -215,6 +215,218 @@ public final class AfIconSets {
 		R.drawable.icon_ms_weather_mix, // 48
 		R.drawable.icon_ms_weather_snowy, // 49
 		R.drawable.icon_ms_snowing_heavy, // 50
+	};
+
+	public static final int[] METEOCONS_FLAT_DAY = {
+		R.drawable.icon_mf_clear_day, // 1
+		R.drawable.icon_mf_mostly_clear_day, // 2
+		R.drawable.icon_mf_partly_cloudy_day, // 3
+		R.drawable.icon_mf_cloudy, // 4
+		R.drawable.icon_mf_partly_cloudy_day_rain, // 5
+		R.drawable.icon_mf_thunderstorms_day_rain, // 6
+		R.drawable.icon_mf_partly_cloudy_day_sleet, // 7
+		R.drawable.icon_mf_partly_cloudy_day_snow, // 8
+		R.drawable.icon_mf_rain, // 9
+		R.drawable.icon_mf_extreme_rain, // 10
+		R.drawable.icon_mf_thunderstorms_extreme_rain, // 11
+		R.drawable.icon_mf_sleet, // 12
+		R.drawable.icon_mf_snow, // 13
+		R.drawable.icon_mf_thunderstorms_snow, // 14
+		R.drawable.icon_mf_fog, // 15
+		0, // 16 placeholder
+		0, // 17 placeholder
+		0, // 18 placeholder
+		0, // 19 placeholder
+		R.drawable.icon_mf_thunderstorms_day_sleet, // 20
+		R.drawable.icon_mf_thunderstorms_day_snow, // 21
+		R.drawable.icon_mf_thunderstorms_rain, // 22
+		R.drawable.icon_mf_thunderstorms_sleet, // 23
+		R.drawable.icon_mf_thunderstorms_day_rain, // 24
+		R.drawable.icon_mf_thunderstorms_extreme_day_rain, // 25
+		R.drawable.icon_mf_thunderstorms_day_sleet, // 26
+		R.drawable.icon_mf_thunderstorms_extreme_day_sleet, // 27
+		R.drawable.icon_mf_thunderstorms_day_snow, // 28
+		R.drawable.icon_mf_thunderstorms_extreme_day_snow, // 29
+		R.drawable.icon_mf_thunderstorms_drizzle, // 30
+		R.drawable.icon_mf_thunderstorms_sleet, // 31
+		R.drawable.icon_mf_thunderstorms_extreme_sleet, // 32
+		R.drawable.icon_mf_thunderstorms_snow, // 33
+		R.drawable.icon_mf_thunderstorms_extreme_snow, // 34
+		0, // 35 placeholder
+		0, // 36 placeholder
+		0, // 37 placeholder
+		0, // 38 placeholder
+		0, // 39 placeholder
+		R.drawable.icon_mf_partly_cloudy_day_drizzle, // 40
+		R.drawable.icon_mf_extreme_day_rain, // 41
+		R.drawable.icon_mf_partly_cloudy_day_sleet, // 42
+		R.drawable.icon_mf_extreme_day_sleet, // 43
+		R.drawable.icon_mf_partly_cloudy_day_snow, // 44
+		R.drawable.icon_mf_extreme_day_snow, // 45
+		R.drawable.icon_mf_drizzle, // 46
+		R.drawable.icon_mf_sleet, // 47
+		R.drawable.icon_mf_extreme_sleet, // 48
+		R.drawable.icon_mf_snow, // 49
+		R.drawable.icon_mf_extreme_snow, // 50
+	};
+
+	public static final int[] METEOCONS_FLAT_NIGHT = {
+		R.drawable.icon_mf_clear_night, // 1
+		R.drawable.icon_mf_mostly_clear_night, // 2
+		R.drawable.icon_mf_partly_cloudy_night, // 3
+		R.drawable.icon_mf_cloudy, // 4
+		R.drawable.icon_mf_partly_cloudy_night_rain, // 5
+		R.drawable.icon_mf_thunderstorms_night_rain, // 6
+		R.drawable.icon_mf_partly_cloudy_night_sleet, // 7
+		R.drawable.icon_mf_partly_cloudy_night_snow, // 8
+		R.drawable.icon_mf_rain, // 9
+		R.drawable.icon_mf_extreme_rain, // 10
+		R.drawable.icon_mf_thunderstorms_extreme_rain, // 11
+		R.drawable.icon_mf_sleet, // 12
+		R.drawable.icon_mf_snow, // 13
+		R.drawable.icon_mf_thunderstorms_snow, // 14
+		R.drawable.icon_mf_fog, // 15
+		0, // 16 placeholder
+		0, // 17 placeholder
+		0, // 18 placeholder
+		0, // 19 placeholder
+		R.drawable.icon_mf_thunderstorms_night_sleet, // 20
+		R.drawable.icon_mf_thunderstorms_night_snow, // 21
+		R.drawable.icon_mf_thunderstorms_rain, // 22
+		R.drawable.icon_mf_thunderstorms_sleet, // 23
+		R.drawable.icon_mf_thunderstorms_night_rain, // 24
+		R.drawable.icon_mf_thunderstorms_extreme_night_rain, // 25
+		R.drawable.icon_mf_thunderstorms_night_sleet, // 26
+		R.drawable.icon_mf_thunderstorms_extreme_night_sleet, // 27
+		R.drawable.icon_mf_thunderstorms_night_snow, // 28
+		R.drawable.icon_mf_thunderstorms_extreme_night_snow, // 29
+		R.drawable.icon_mf_thunderstorms_drizzle, // 30
+		R.drawable.icon_mf_thunderstorms_sleet, // 31
+		R.drawable.icon_mf_thunderstorms_extreme_sleet, // 32
+		R.drawable.icon_mf_thunderstorms_snow, // 33
+		R.drawable.icon_mf_thunderstorms_extreme_snow, // 34
+		0, // 35 placeholder
+		0, // 36 placeholder
+		0, // 37 placeholder
+		0, // 38 placeholder
+		0, // 39 placeholder
+		R.drawable.icon_mf_partly_cloudy_night_drizzle, // 40
+		R.drawable.icon_mf_extreme_night_rain, // 41
+		R.drawable.icon_mf_partly_cloudy_night_sleet, // 42
+		R.drawable.icon_mf_extreme_night_sleet, // 43
+		R.drawable.icon_mf_partly_cloudy_night_snow, // 44
+		R.drawable.icon_mf_extreme_night_snow, // 45
+		R.drawable.icon_mf_drizzle, // 46
+		R.drawable.icon_mf_sleet, // 47
+		R.drawable.icon_mf_extreme_sleet, // 48
+		R.drawable.icon_mf_snow, // 49
+		R.drawable.icon_mf_extreme_snow, // 50
+	};
+
+	public static final int[] METEOCONS_LINE_DAY = {
+		R.drawable.icon_ml_clear_day, // 1
+		R.drawable.icon_ml_mostly_clear_day, // 2
+		R.drawable.icon_ml_partly_cloudy_day, // 3
+		R.drawable.icon_ml_cloudy, // 4
+		R.drawable.icon_ml_partly_cloudy_day_rain, // 5
+		R.drawable.icon_ml_thunderstorms_day_rain, // 6
+		R.drawable.icon_ml_partly_cloudy_day_sleet, // 7
+		R.drawable.icon_ml_partly_cloudy_day_snow, // 8
+		R.drawable.icon_ml_rain, // 9
+		R.drawable.icon_ml_extreme_rain, // 10
+		R.drawable.icon_ml_thunderstorms_extreme_rain, // 11
+		R.drawable.icon_ml_sleet, // 12
+		R.drawable.icon_ml_snow, // 13
+		R.drawable.icon_ml_thunderstorms_snow, // 14
+		R.drawable.icon_ml_fog, // 15
+		0, // 16 placeholder
+		0, // 17 placeholder
+		0, // 18 placeholder
+		0, // 19 placeholder
+		R.drawable.icon_ml_thunderstorms_day_sleet, // 20
+		R.drawable.icon_ml_thunderstorms_day_snow, // 21
+		R.drawable.icon_ml_thunderstorms_rain, // 22
+		R.drawable.icon_ml_thunderstorms_sleet, // 23
+		R.drawable.icon_ml_thunderstorms_day_rain, // 24
+		R.drawable.icon_ml_thunderstorms_extreme_day_rain, // 25
+		R.drawable.icon_ml_thunderstorms_day_sleet, // 26
+		R.drawable.icon_ml_thunderstorms_extreme_day_sleet, // 27
+		R.drawable.icon_ml_thunderstorms_day_snow, // 28
+		R.drawable.icon_ml_thunderstorms_extreme_day_snow, // 29
+		R.drawable.icon_ml_thunderstorms_drizzle, // 30
+		R.drawable.icon_ml_thunderstorms_sleet, // 31
+		R.drawable.icon_ml_thunderstorms_extreme_sleet, // 32
+		R.drawable.icon_ml_thunderstorms_snow, // 33
+		R.drawable.icon_ml_thunderstorms_extreme_snow, // 34
+		0, // 35 placeholder
+		0, // 36 placeholder
+		0, // 37 placeholder
+		0, // 38 placeholder
+		0, // 39 placeholder
+		R.drawable.icon_ml_partly_cloudy_day_drizzle, // 40
+		R.drawable.icon_ml_extreme_day_rain, // 41
+		R.drawable.icon_ml_partly_cloudy_day_sleet, // 42
+		R.drawable.icon_ml_extreme_day_sleet, // 43
+		R.drawable.icon_ml_partly_cloudy_day_snow, // 44
+		R.drawable.icon_ml_extreme_day_snow, // 45
+		R.drawable.icon_ml_drizzle, // 46
+		R.drawable.icon_ml_sleet, // 47
+		R.drawable.icon_ml_extreme_sleet, // 48
+		R.drawable.icon_ml_snow, // 49
+		R.drawable.icon_ml_extreme_snow, // 50
+	};
+
+	public static final int[] METEOCONS_LINE_NIGHT = {
+		R.drawable.icon_ml_clear_night, // 1
+		R.drawable.icon_ml_mostly_clear_night, // 2
+		R.drawable.icon_ml_partly_cloudy_night, // 3
+		R.drawable.icon_ml_cloudy, // 4
+		R.drawable.icon_ml_partly_cloudy_night_rain, // 5
+		R.drawable.icon_ml_thunderstorms_night_rain, // 6
+		R.drawable.icon_ml_partly_cloudy_night_sleet, // 7
+		R.drawable.icon_ml_partly_cloudy_night_snow, // 8
+		R.drawable.icon_ml_rain, // 9
+		R.drawable.icon_ml_extreme_rain, // 10
+		R.drawable.icon_ml_thunderstorms_extreme_rain, // 11
+		R.drawable.icon_ml_sleet, // 12
+		R.drawable.icon_ml_snow, // 13
+		R.drawable.icon_ml_thunderstorms_snow, // 14
+		R.drawable.icon_ml_fog, // 15
+		0, // 16 placeholder
+		0, // 17 placeholder
+		0, // 18 placeholder
+		0, // 19 placeholder
+		R.drawable.icon_ml_thunderstorms_night_sleet, // 20
+		R.drawable.icon_ml_thunderstorms_night_snow, // 21
+		R.drawable.icon_ml_thunderstorms_rain, // 22
+		R.drawable.icon_ml_thunderstorms_sleet, // 23
+		R.drawable.icon_ml_thunderstorms_night_rain, // 24
+		R.drawable.icon_ml_thunderstorms_extreme_night_rain, // 25
+		R.drawable.icon_ml_thunderstorms_night_sleet, // 26
+		R.drawable.icon_ml_thunderstorms_extreme_night_sleet, // 27
+		R.drawable.icon_ml_thunderstorms_night_snow, // 28
+		R.drawable.icon_ml_thunderstorms_extreme_night_snow, // 29
+		R.drawable.icon_ml_thunderstorms_drizzle, // 30
+		R.drawable.icon_ml_thunderstorms_sleet, // 31
+		R.drawable.icon_ml_thunderstorms_extreme_sleet, // 32
+		R.drawable.icon_ml_thunderstorms_snow, // 33
+		R.drawable.icon_ml_thunderstorms_extreme_snow, // 34
+		0, // 35 placeholder
+		0, // 36 placeholder
+		0, // 37 placeholder
+		0, // 38 placeholder
+		0, // 39 placeholder
+		R.drawable.icon_ml_partly_cloudy_night_drizzle, // 40
+		R.drawable.icon_ml_extreme_night_rain, // 41
+		R.drawable.icon_ml_partly_cloudy_night_sleet, // 42
+		R.drawable.icon_ml_extreme_night_sleet, // 43
+		R.drawable.icon_ml_partly_cloudy_night_snow, // 44
+		R.drawable.icon_ml_extreme_night_snow, // 45
+		R.drawable.icon_ml_drizzle, // 46
+		R.drawable.icon_ml_sleet, // 47
+		R.drawable.icon_ml_extreme_sleet, // 48
+		R.drawable.icon_ml_snow, // 49
+		R.drawable.icon_ml_extreme_snow, // 50
 	};
 
 }

@@ -58,12 +58,16 @@
 		<item>Color (MET Norway)</item>
 		<item>Meteocons (monochrome)</item>
 		<item>Material Symbols (monochrome)</item>
+		<item>Meteocons Flat (color)</item>
+		<item>Meteocons Line (color)</item>
 	</string-array>
 
 	<string-array name="icon_style_code" translatable="false">
 		<item>1</item>
 		<item>2</item>
 		<item>3</item>
+		<item>4</item>
+		<item>5</item>
 	</string-array>
 
 	<string-array name="provider_code" translatable="false">

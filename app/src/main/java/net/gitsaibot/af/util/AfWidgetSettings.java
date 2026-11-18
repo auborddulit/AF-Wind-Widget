@@ -22,6 +22,8 @@ public class AfWidgetSettings {
 	public static final int ICON_STYLE_COLOR = 1;
 	public static final int ICON_STYLE_METEOCONS = 2;
 	public static final int ICON_STYLE_MATERIAL = 3;
+	public static final int ICON_STYLE_METEOCONS_FLAT = 4;
+	public static final int ICON_STYLE_METEOCONS_LINE = 5;
 
 	private Context mContext;
 	private Map<String, Object> mSettings;
