@@ -1584,7 +1584,7 @@ public class AfDetailedWidget {
 		Rect bounds = new Rect();
 
 		int numSteps = (int) Math.round(mWindScaleMax / mWindLabelStep);
-		for (int i = every; i <= numSteps; i += every) {
+		for (int i = 0; i <= numSteps; i += every) // from 0, like the temperature scale {
 			double value = i * mWindLabelStep;
 			String label = Integer.toString((int) Math.round(value));
 			mWindLabelPaint.getTextBounds(label, 0, label.length(), bounds);
