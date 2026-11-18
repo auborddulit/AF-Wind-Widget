@@ -1053,29 +1053,23 @@ public class AfDetailedWidget {
 
 	/** Cloud cover as a grey veil hanging from the top of the graph: the more cloud, the lower it reaches. */
 	private void drawCloudCover(Canvas canvas) {
-		Path veil = new Path();
+		ArrayList<PointF> points = new ArrayList<>();
 		float timeRange = (float) (mTimeTo - mTimeFrom);
-		float firstX = 0, lastX = 0;
-		int count = 0;
 
 		for (PointData p : mPointData) {
 			if (p.time == null || p.cloudCover == null) continue;
-			float x = mGraphRect.left + (p.time - mTimeFrom) / timeRange * mGraphRect.width();
+			float x = (p.time - mTimeFrom) / timeRange;
 			float cover = Math.max(0.0f, Math.min(100.0f, p.cloudCover)) / 100.0f;
-			float y = mGraphRect.top + cover * CLOUD_VEIL_MAX_DEPTH * mGraphRect.height();
-			if (count == 0) {
-				veil.moveTo(x, mGraphRect.top);
-				firstX = x;
-			}
-			veil.lineTo(x, y);
-			lastX = x;
-			count++;
+			points.add(new PointF(x, cover * CLOUD_VEIL_MAX_DEPTH));
 		}
-		if (count < 2) return;
+		if (points.size() < 2) return;
 
-		veil.lineTo(lastX, mGraphRect.top);
-		veil.lineTo(firstX, mGraphRect.top);
+		// Smooth curve, like the temperature line
+		Path veil = CatmullRomSpline.buildPath(points.toArray(new PointF[0]));
+		veil.lineTo(points.get(points.size() - 1).x, -1.0f);
+		veil.lineTo(points.get(0).x, -1.0f);
 		veil.close();
+		toGraphCoordinates(veil);
 
 		canvas.save();
 		canvas.clipRect(mGraphRect.left + 1, mGraphRect.top, mGraphRect.right, mGraphRect.bottom);
@@ -1584,7 +1578,8 @@ public class AfDetailedWidget {
 		Rect bounds = new Rect();
 
 		int numSteps = (int) Math.round(mWindScaleMax / mWindLabelStep);
-		for (int i = 0; i <= numSteps; i += every) // from 0, like the temperature scale {
+		// From 0 at the bottom, like the temperature scale
+		for (int i = 0; i <= numSteps; i += every) {
 			double value = i * mWindLabelStep;
 			String label = Integer.toString((int) Math.round(value));
 			mWindLabelPaint.getTextBounds(label, 0, label.length(), bounds);
