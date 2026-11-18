@@ -25,6 +25,8 @@ public class PointDataInsertTest {
 		assertTrue(columns.contains(AfPointDataForecastColumns.WIND_SPEED));
 		assertTrue(columns.contains(AfPointDataForecastColumns.WIND_GUST));
 		assertTrue(columns.contains(AfPointDataForecastColumns.WIND_DIRECTION));
+		assertTrue(columns.contains(AfPointDataForecastColumns.FEELS_LIKE));
+		assertTrue(columns.contains(AfPointDataForecastColumns.CLOUD_COVER));
 	}
 
 	@Test

@@ -120,6 +120,10 @@ public class AfDetailedWidget {
 	private int[] mPolarIcons = WEATHER_ICONS_POLAR;
 	private Paint mIconPaint = null;
 
+	/* Feels-like temperature area and cloud cover veil (AF Wind Widget) */
+	private Paint mFeelsLikeAbovePaint, mFeelsLikeBelowPaint, mCloudPaint;
+	private static final float CLOUD_VEIL_MAX_DEPTH = 0.45f; // fraction of the graph height at 100 % cover
+
 	/* Wind (AF Wind Widget) */
 	private Paint mWindLinkPaint, mWindLinkStrongPaint;
 	private Paint mWindDotPaint, mGustDotPaint, mStrongDotPaint;
@@ -239,10 +243,18 @@ public class AfDetailedWidget {
             drawDayAndNight(canvas);
         }
 
+        if (mWidgetSettings.drawCloudCover()) {
+            drawCloudCover(canvas);
+        }
+
         Path minRainPath = new Path();
         Path maxRainPath = new Path();
         buildRainPaths(minRainPath, maxRainPath);
         drawRainPaths(canvas, minRainPath, maxRainPath);
+
+        if (mWidgetSettings.drawFeelsLike()) {
+            drawFeelsLike(canvas);
+        }
 
         if (mDrawWind) {
             drawWind(canvas);
@@ -250,11 +262,7 @@ public class AfDetailedWidget {
 
         PointF[] temperaturePointArray = buildTemperaturePointArray(mPointData, mTimeFrom, mTimeTo, (float)mTemperatureRangeMax, (float)mTemperatureRangeMin);
         Path temperaturePath = CatmullRomSpline.buildPath(temperaturePointArray);
-
-        Matrix scaleMatrix = new Matrix();
-        scaleMatrix.setScale(mGraphRect.width(), mGraphRect.height());
-        temperaturePath.transform(scaleMatrix);
-        temperaturePath.offset(mGraphRect.left, mGraphRect.top);
+        toGraphCoordinates(temperaturePath);
         drawTemperature(canvas, temperaturePath);
 
         drawGridOutline(canvas);
@@ -994,6 +1002,90 @@ public class AfDetailedWidget {
 
 	private void drawTemperature(Canvas canvas, Path temperaturePath)
 	{
+		drawSplitAtFreezing(canvas, temperaturePath, mAboveFreezingTemperaturePaint, mBelowFreezingTemperaturePaint);
+	}
+
+	/** Scales a path built in 0..1 graph units to the graph rectangle. */
+	private void toGraphCoordinates(Path path) {
+		Matrix scaleMatrix = new Matrix();
+		scaleMatrix.setScale(mGraphRect.width(), mGraphRect.height());
+		path.transform(scaleMatrix);
+		path.offset(mGraphRect.left, mGraphRect.top);
+	}
+
+	/**
+	 * Area between the temperature and the feels-like temperature, in the temperature
+	 * colors (above/below freezing) made translucent.
+	 */
+	private void drawFeelsLike(Canvas canvas) {
+		ArrayList<PointF> temperaturePoints = new ArrayList<>();
+		ArrayList<PointF> feelsLikePoints = new ArrayList<>();
+		float range = (float) (mTemperatureRangeMax - mTemperatureRangeMin);
+		float timeRange = (float) (mTimeTo - mTimeFrom);
+
+		for (PointData p : mPointData) {
+			if (p.time == null || p.temperature == null || p.feelsLike == null) continue;
+			float x = (p.time - mTimeFrom) / timeRange;
+			temperaturePoints.add(new PointF(x, 1.0f - (p.temperature - (float) mTemperatureRangeMin) / range));
+			feelsLikePoints.add(new PointF(x, 1.0f - (p.feelsLike - (float) mTemperatureRangeMin) / range));
+		}
+		if (temperaturePoints.size() < 2) return;
+
+		Path below = closedToBottom(CatmullRomSpline.buildPath(temperaturePoints.toArray(new PointF[0])), temperaturePoints);
+		Path belowFeels = closedToBottom(CatmullRomSpline.buildPath(feelsLikePoints.toArray(new PointF[0])), feelsLikePoints);
+
+		// XOR of "below temperature" and "below feels-like" is the band between the two curves
+		Path area = new Path();
+		if (!area.op(below, belowFeels, Path.Op.XOR)) return;
+		toGraphCoordinates(area);
+
+		drawSplitAtFreezing(canvas, area, mFeelsLikeAbovePaint, mFeelsLikeBelowPaint);
+	}
+
+	private static Path closedToBottom(Path curve, ArrayList<PointF> points) {
+		Path path = new Path(curve);
+		float bottom = 2.0f; // well below the graph, clipped when drawn
+		path.lineTo(points.get(points.size() - 1).x, bottom);
+		path.lineTo(points.get(0).x, bottom);
+		path.close();
+		return path;
+	}
+
+	/** Cloud cover as a grey veil hanging from the top of the graph: the more cloud, the lower it reaches. */
+	private void drawCloudCover(Canvas canvas) {
+		Path veil = new Path();
+		float timeRange = (float) (mTimeTo - mTimeFrom);
+		float firstX = 0, lastX = 0;
+		int count = 0;
+
+		for (PointData p : mPointData) {
+			if (p.time == null || p.cloudCover == null) continue;
+			float x = mGraphRect.left + (p.time - mTimeFrom) / timeRange * mGraphRect.width();
+			float cover = Math.max(0.0f, Math.min(100.0f, p.cloudCover)) / 100.0f;
+			float y = mGraphRect.top + cover * CLOUD_VEIL_MAX_DEPTH * mGraphRect.height();
+			if (count == 0) {
+				veil.moveTo(x, mGraphRect.top);
+				firstX = x;
+			}
+			veil.lineTo(x, y);
+			lastX = x;
+			count++;
+		}
+		if (count < 2) return;
+
+		veil.lineTo(lastX, mGraphRect.top);
+		veil.lineTo(firstX, mGraphRect.top);
+		veil.close();
+
+		canvas.save();
+		canvas.clipRect(mGraphRect.left + 1, mGraphRect.top, mGraphRect.right, mGraphRect.bottom);
+		canvas.drawPath(veil, mCloudPaint);
+		canvas.restore();
+	}
+
+	/** Draws a path with one paint above the freezing temperature and another below it. */
+	private void drawSplitAtFreezing(Canvas canvas, Path temperaturePath, Paint abovePaint, Paint belowPaint)
+	{
 		float freezingTemperature = mWidgetSettings.useFahrenheit() ? 32.0f : 0.0f;
 
 		// This is the y-coordinate on the graph that corresponds to the freezing temperature.
@@ -1008,20 +1100,20 @@ public class AfDetailedWidget {
 		if (mTemperatureRangeMin >= freezingTemperature) {
 			// All above freezing
 			canvas.clipRect(graphRectInner);
-			canvas.drawPath(temperaturePath, mAboveFreezingTemperaturePaint);
+			canvas.drawPath(temperaturePath, abovePaint);
 		} else if (mTemperatureRangeMax <= freezingTemperature) {
 			// All below freezing
 			canvas.clipRect(graphRectInner);
-			canvas.drawPath(temperaturePath, mBelowFreezingTemperaturePaint);
+			canvas.drawPath(temperaturePath, belowPaint);
 		} else {
 			// Path is both above and below freezing, split the drawing
 			canvas.clipRect(graphRectInner.left, graphRectInner.top, graphRectInner.right, freezingPosY);
-			canvas.drawPath(temperaturePath, mAboveFreezingTemperaturePaint);
+			canvas.drawPath(temperaturePath, abovePaint);
 			canvas.restore(); // Restore from the first clip
 
 			canvas.save();
 			canvas.clipRect(graphRectInner.left, freezingPosY, graphRectInner.right, graphRectInner.bottom);
-			canvas.drawPath(temperaturePath, mBelowFreezingTemperaturePaint);
+			canvas.drawPath(temperaturePath, belowPaint);
 		}
 		canvas.restore();
 	}
@@ -1297,6 +1389,10 @@ public class AfDetailedWidget {
 		mWindThresholdPaint.setStrokeCap(Paint.Cap.BUTT);
 		mWindLabelPaint = buildTextPaint(mWidgetSettings.getTextColor());
 
+		mFeelsLikeAbovePaint = buildFillPaint(withAlpha(mWidgetSettings.getAboveFreezingColor(), 0x48), true);
+		mFeelsLikeBelowPaint = buildFillPaint(withAlpha(mWidgetSettings.getBelowFreezingColor(), 0x48), true);
+		mCloudPaint = buildFillPaint(mWidgetSettings.getCloudColor(), true);
+
 		setupIconSet();
 	}
 
@@ -1322,6 +1418,10 @@ public class AfDetailedWidget {
 		mIconPaint.setAntiAlias(true);
 		mIconPaint.setFilterBitmap(true);
 		mIconPaint.setColorFilter(new PorterDuffColorFilter(mWidgetSettings.getIconColor(), PorterDuff.Mode.SRC_IN));
+	}
+
+	private static int withAlpha(int color, int alpha) {
+		return (color & 0x00FFFFFF) | (alpha << 24);
 	}
 
 	private static Paint buildFillPaint(int color, boolean antiAlias) {
@@ -1657,7 +1757,10 @@ public class AfDetailedWidget {
 						
 						if (p.time != null && p.timeAdded != null && p.temperature != null)
 						{
-							if (isFahrenheit) p.temperature = p.temperature * 9.0f / 5.0f + 32.0f;
+							if (isFahrenheit) {
+								p.temperature = p.temperature * 9.0f / 5.0f + 32.0f;
+								if (p.feelsLike != null) p.feelsLike = p.feelsLike * 9.0f / 5.0f + 32.0f;
+							}
 							pointData.add(p);
 						}
 					} while (cursor.moveToNext());
@@ -1717,6 +1820,7 @@ public class AfDetailedWidget {
 		float minTemperature = Float.POSITIVE_INFINITY;
 		
 		int validPointDataSamples = 0;
+		boolean drawFeelsLike = mWidgetSettings.drawFeelsLike();
 		// Find maximum, minimum and range of temperatures
 		for (PointData p : mPointData) {
 			// Check if temperature is within viewable range
@@ -1725,6 +1829,12 @@ public class AfDetailedWidget {
 				if (p.temperature > maxTemperature) maxTemperature = p.temperature;
 				if (p.temperature < minTemperature) minTemperature = p.temperature;
 				validPointDataSamples++;
+
+				// Make room for the feels-like area so it is not cut at the bottom
+				if (p.feelsLike != null && drawFeelsLike) {
+					if (p.feelsLike > maxTemperature) maxTemperature = p.feelsLike;
+					if (p.feelsLike < minTemperature) minTemperature = p.feelsLike;
+				}
 			}
 		}
 		

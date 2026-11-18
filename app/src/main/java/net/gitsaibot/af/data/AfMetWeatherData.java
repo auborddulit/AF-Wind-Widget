@@ -204,6 +204,9 @@ public class AfMetWeatherData implements AfDataSource {
 					if (ts.data.instant.details.wind_speed_of_gust != null) {
 						cvPoint.put(AfPointDataForecastColumns.WIND_GUST, ts.data.instant.details.wind_speed_of_gust * 3.6f);
 					}
+					if (ts.data.instant.details.cloud_area_fraction != null) {
+						cvPoint.put(AfPointDataForecastColumns.CLOUD_COVER, ts.data.instant.details.cloud_area_fraction);
+					}
 					if (ts.data.instant.details.wind_from_direction != null) {
 						cvPoint.put(AfPointDataForecastColumns.WIND_DIRECTION, ts.data.instant.details.wind_from_direction);
 					}
@@ -333,6 +336,8 @@ public class AfMetWeatherData implements AfDataSource {
 		public Float wind_speed_of_gust;
 		@SerializedName("wind_from_direction")
 		public Float wind_from_direction;
+		@SerializedName("cloud_area_fraction")
+		public Float cloud_area_fraction;
 	}
 
 	private static class NextHoursData {

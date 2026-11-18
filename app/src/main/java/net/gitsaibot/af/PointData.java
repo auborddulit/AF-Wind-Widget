@@ -18,6 +18,11 @@ public class PointData {
 	public Float windSpeed = null;
 	public Float windGust = null;
 	public Float windDirection = null;
+
+	/** Apparent (feels-like) temperature, same unit as temperature. */
+	public Float feelsLike = null;
+	/** Total cloud cover, 0-100 %. */
+	public Float cloudCover = null;
 	
 	public PointData() { }
 	
@@ -35,6 +40,8 @@ public class PointData {
 		if (windSpeed != null) contentValues.put(AfPointDataForecastColumns.WIND_SPEED, windSpeed);
 		if (windGust != null) contentValues.put(AfPointDataForecastColumns.WIND_GUST, windGust);
 		if (windDirection != null) contentValues.put(AfPointDataForecastColumns.WIND_DIRECTION, windDirection);
+		if (feelsLike != null) contentValues.put(AfPointDataForecastColumns.FEELS_LIKE, feelsLike);
+		if (cloudCover != null) contentValues.put(AfPointDataForecastColumns.CLOUD_COVER, cloudCover);
 		
 		return contentValues;
 	}
@@ -65,6 +72,12 @@ public class PointData {
 
 		columnIndex = c.getColumnIndex(AfPointDataForecastColumns.WIND_DIRECTION);
 		if (columnIndex != -1 && !c.isNull(columnIndex)) pointData.windDirection = c.getFloat(columnIndex);
+
+		columnIndex = c.getColumnIndex(AfPointDataForecastColumns.FEELS_LIKE);
+		if (columnIndex != -1 && !c.isNull(columnIndex)) pointData.feelsLike = c.getFloat(columnIndex);
+
+		columnIndex = c.getColumnIndex(AfPointDataForecastColumns.CLOUD_COVER);
+		if (columnIndex != -1 && !c.isNull(columnIndex)) pointData.cloudCover = c.getFloat(columnIndex);
 
 		return pointData;
 	}

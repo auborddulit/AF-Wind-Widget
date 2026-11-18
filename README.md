@@ -12,6 +12,7 @@ Personal fork of [AF Weather Widget](https://github.com/Gitsaibot/AF-Weather-Wid
 - **Top line**: the current wind ("Wind 18 km/h (gust 38)") replaces the sea level pressure (MSLP).
 - **New settings** (Appearance → Wind): show wind, threshold, mean wind color, gust color and above-threshold color.
 - **Location search and time zones**: Open-Meteo instead of GeoNames (no GeoNames account needed).
+- **Feels-like temperature and cloud cover**: a shaded area between the real and feels-like temperature, and a grey veil from the top of the graph that reaches lower when it is cloudier (Appearance → Feels-like and clouds).
 - **Weather icons**: the original color icons, or the monochrome [Meteocons](https://github.com/basmilius/meteocons) or [Material Symbols](https://github.com/google/material-design-icons) sets in a color of your choice (Appearance → Weather icons).
 - **Backup and restore**: save the settings and locations to a file (Downloads, Google Drive...) and load them back, from the main settings screen.
 - **Smaller APK**: unused library code and resources are removed at build time.

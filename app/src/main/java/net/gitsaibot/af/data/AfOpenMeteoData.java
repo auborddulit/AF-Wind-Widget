@@ -37,7 +37,7 @@ public class AfOpenMeteoData implements AfDataSource {
 
 	private static final String HOURLY_VARIABLES =
 			"temperature_2m,relative_humidity_2m,pressure_msl,precipitation,weather_code," +
-			"wind_speed_10m,wind_gusts_10m,wind_direction_10m";
+			"wind_speed_10m,wind_gusts_10m,wind_direction_10m,apparent_temperature,cloud_cover";
 
 	private final Context mContext;
 	private final AfUpdate mAfUpdate;
@@ -160,6 +160,8 @@ public class AfOpenMeteoData implements AfDataSource {
 					putIfNotNull(cv, AfPointDataForecastColumns.WIND_SPEED, get(h.windSpeed, i));
 					putIfNotNull(cv, AfPointDataForecastColumns.WIND_GUST, get(h.windGusts, i));
 					putIfNotNull(cv, AfPointDataForecastColumns.WIND_DIRECTION, get(h.windDirection, i));
+					putIfNotNull(cv, AfPointDataForecastColumns.FEELS_LIKE, get(h.apparentTemperature, i));
+					putIfNotNull(cv, AfPointDataForecastColumns.CLOUD_COVER, get(h.cloudCover, i));
 					pointDataValues.add(cv);
 				}
 
@@ -267,5 +269,9 @@ public class AfOpenMeteoData implements AfDataSource {
 		public List<Float> windGusts;
 		@SerializedName("wind_direction_10m")
 		public List<Float> windDirection;
+		@SerializedName("apparent_temperature")
+		public List<Float> apparentTemperature;
+		@SerializedName("cloud_cover")
+		public List<Float> cloudCover;
 	}
 }

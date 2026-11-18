@@ -21,5 +21,6 @@
     <color name="gust">#FFF5A623</color>
     <color name="wind_strong">#FFB57CFF</color>
     <color name="icon">#FFFFFFFF</color>
+    <color name="cloud_veil">#30C8CDD2</color>
     <color name="invalid_dimension_color">#FFCE2029</color>
 </resources>

@@ -46,7 +46,10 @@
     	\n\u2022 Each hour, a dot shows the mean wind speed and a second dot the strongest gust, linked by a line. Speeds are in km/h, with the scale on the right side of the graph.
     	\n\u2022 Above the strong wind threshold (40 km/h by default), dots and lines change color, and a dotted line marks the threshold.\n
 
-		\nThe threshold and the colors can be changed in the appearance settings, under Wind.
+		\nThe threshold and the colors can be changed in the appearance settings, under Wind.\n
+
+		\n\u2022 The shaded area under the temperature line goes down to the feels-like temperature (wind and humidity included).
+		\n\u2022 The grey veil at the top shows the cloud cover: the cloudier, the lower it reaches.
 	</string>
 
 	<!-- InfoText -->
@@ -312,5 +315,17 @@
 	<string name="ui_settings_category_icons">Weather icons</string>
 	<string name="icon_style_title">Icon style</string>
 	<string name="icon_color_title">Icon color (monochrome styles)</string>
+	<!-- Feels-like temperature and cloud cover -->
+	<string name="feels_like_enabled_bool" translatable="false">feels_like_enabled_bool</string>
+	<string name="cloud_cover_enabled_bool" translatable="false">cloud_cover_enabled_bool</string>
+	<string name="cloud_color_int" translatable="false">cloud_color_int</string>
+	<string name="ui_settings_category_extra">Feels-like and clouds</string>
+	<string name="feels_like_title">Show feels-like temperature</string>
+	<string name="feels_like_summary_on">Shaded area between real and feels-like temperature</string>
+	<string name="feels_like_summary_off">Hidden</string>
+	<string name="cloud_cover_title">Show cloud cover</string>
+	<string name="cloud_cover_summary_on">Grey veil from the top, lower when cloudier</string>
+	<string name="cloud_cover_summary_off">Hidden</string>
+	<string name="cloud_color_title">Cloud veil color</string>
 
 </resources>

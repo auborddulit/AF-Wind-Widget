@@ -99,6 +99,8 @@ public class AfWidgetSettings {
 		settings.put(context.getString(R.string.day_effect_bool), Boolean.TRUE);
 		settings.put(context.getString(R.string.border_enabled_bool), Boolean.TRUE);
 		settings.put(context.getString(R.string.wind_enabled_bool), Boolean.TRUE);
+		settings.put(context.getString(R.string.feels_like_enabled_bool), Boolean.TRUE);
+		settings.put(context.getString(R.string.cloud_cover_enabled_bool), Boolean.TRUE);
 		
 		AfWidgetSettings afWidgetSettings = new AfWidgetSettings(context);
 		afWidgetSettings.mSettings = settings;
@@ -213,7 +215,8 @@ public class AfWidgetSettings {
 				{ R.string.wind_color_int, R.color.wind },
 				{ R.string.gust_color_int, R.color.gust },
 				{ R.string.wind_strong_color_int, R.color.wind_strong },
-				{ R.string.icon_color_int, R.color.icon } };
+				{ R.string.icon_color_int, R.color.icon },
+				{ R.string.cloud_color_int, R.color.cloud_veil } };
 
 		for (int[] defaultColor : defaultColors) {
 			String key = r.getString(defaultColor[0]);
@@ -383,6 +386,22 @@ public class AfWidgetSettings {
 	public int getIconColor() {
 		Integer color = getIntegerSetting(mContext.getString(R.string.icon_color_int));
 		if (color == null) color = ContextCompat.getColor(mContext, R.color.icon);
+		return color;
+	}
+
+	public boolean drawFeelsLike() {
+		Boolean value = getBooleanSetting(mContext.getString(R.string.feels_like_enabled_bool));
+		return value == null || value;
+	}
+
+	public boolean drawCloudCover() {
+		Boolean value = getBooleanSetting(mContext.getString(R.string.cloud_cover_enabled_bool));
+		return value == null || value;
+	}
+
+	public int getCloudColor() {
+		Integer color = getIntegerSetting(mContext.getString(R.string.cloud_color_int));
+		if (color == null) color = ContextCompat.getColor(mContext, R.color.cloud_veil);
 		return color;
 	}
 

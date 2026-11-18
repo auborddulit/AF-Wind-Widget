@@ -173,6 +173,8 @@ public class AfProvider extends ContentProvider {
 		String WIND_SPEED = "windSpeed";
 		String WIND_GUST = "windGust";
 		String WIND_DIRECTION = "windDirection";
+		String FEELS_LIKE = "feelsLike";
+		String CLOUD_COVER = "cloudCover";
 		
 		int LOCATION_COLUMN = 1;
 		int TIME_ADDED_COLUMN = 2;
@@ -183,10 +185,12 @@ public class AfProvider extends ContentProvider {
 		int WIND_SPEED_COLUMN = 7;
 		int WIND_GUST_COLUMN = 8;
 		int WIND_DIRECTION_COLUMN = 9;
+		int FEELS_LIKE_COLUMN = 10;
+		int CLOUD_COVER_COLUMN = 11;
 
 		String[] ALL_COLUMNS = new String[] {
 				BaseColumns._ID, LOCATION, TIME_ADDED, TIME, TEMPERATURE, HUMIDITY, PRESSURE,
-				WIND_SPEED, WIND_GUST, WIND_DIRECTION };
+				WIND_SPEED, WIND_GUST, WIND_DIRECTION, FEELS_LIKE, CLOUD_COVER };
 	}
 	
 	public static class AfPointDataForecasts implements BaseColumns, AfPointDataForecastColumns {
@@ -321,8 +325,8 @@ public class AfProvider extends ContentProvider {
 	
 	private static class DatabaseHelper extends SQLiteOpenHelper {
 		private static final String DATABASE_NAME = "aix_database.db";
-		private static final int DATABASE_VERSION = 10;
-		// AF Wind Widget = version 10 (wind columns)
+		// AF Wind Widget: version 10 = wind columns, version 11 = feels-like and cloud cover
+		private static final int DATABASE_VERSION = 11;
 		// 0.1.6 = version 8
 		// 0.1.5 = version 7
 		// 0.1.4 = version 6
@@ -403,7 +407,9 @@ public class AfProvider extends ContentProvider {
 					+ AfPointDataForecastColumns.PRESSURE + " REAL,"
 					+ AfPointDataForecastColumns.WIND_SPEED + " REAL,"
 					+ AfPointDataForecastColumns.WIND_GUST + " REAL,"
-					+ AfPointDataForecastColumns.WIND_DIRECTION + " REAL);");
+					+ AfPointDataForecastColumns.WIND_DIRECTION + " REAL,"
+					+ AfPointDataForecastColumns.FEELS_LIKE + " REAL,"
+					+ AfPointDataForecastColumns.CLOUD_COVER + " REAL);");
 
 			db.execSQL("CREATE TABLE " + TABLE_AIXINTERVALDATAFORECASTS + " ("
 					+ BaseColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
@@ -443,6 +449,17 @@ public class AfProvider extends ContentProvider {
 		@Override
 		public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 			Log.d(TAG, "onUpdate() oldVersion=" + oldVersion + ",newVersion=" + newVersion);
+
+			if (oldVersion >= 10) {
+				// AF Wind Widget: only add the new forecast columns, keep widgets, locations and settings
+				if (oldVersion < 11) {
+					db.execSQL("ALTER TABLE " + TABLE_AIXPOINTDATAFORECASTS
+							+ " ADD COLUMN " + AfPointDataForecastColumns.FEELS_LIKE + " REAL");
+					db.execSQL("ALTER TABLE " + TABLE_AIXPOINTDATAFORECASTS
+							+ " ADD COLUMN " + AfPointDataForecastColumns.CLOUD_COVER + " REAL");
+				}
+				return;
+			}
 
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_AIXWIDGETS);
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_AIXVIEWS);
@@ -1379,30 +1396,10 @@ public class AfProvider extends ContentProvider {
 				insert.bindLong(2, timeAdded);
 				insert.bindLong(3, time);
 				
-				Double temperature = value.getAsDouble(AfPointDataForecasts.TEMPERATURE);
-				if (temperature != null) {
-					insert.bindDouble(4, temperature);
-				} else {
-					insert.bindNull(4);
+				// Columns after LOCATION, TIME_ADDED and TIME are all optional numbers
+				for (int i = 3; i < POINT_DATA_INSERT_COLUMNS.length; i++) {
+					bindOptionalDouble(insert, i + 1, value.getAsDouble(POINT_DATA_INSERT_COLUMNS[i]));
 				}
-				
-				Double humidity = value.getAsDouble(AfPointDataForecasts.HUMIDITY);
-				if (humidity != null) {
-					insert.bindDouble(5, humidity);
-				} else {
-					insert.bindNull(5);
-				}
-				
-				Double pressure = value.getAsDouble(AfPointDataForecasts.PRESSURE);
-				if (pressure != null) {
-					insert.bindDouble(6, pressure);
-				} else {
-					insert.bindNull(6);
-				}
-
-				bindOptionalDouble(insert, 7, value.getAsDouble(AfPointDataForecasts.WIND_SPEED));
-				bindOptionalDouble(insert, 8, value.getAsDouble(AfPointDataForecasts.WIND_GUST));
-				bindOptionalDouble(insert, 9, value.getAsDouble(AfPointDataForecasts.WIND_DIRECTION));
 				
 				insert.execute();
 				numInserted++;
@@ -1422,7 +1419,9 @@ public class AfProvider extends ContentProvider {
 			AfPointDataForecastColumns.PRESSURE,
 			AfPointDataForecastColumns.WIND_SPEED,
 			AfPointDataForecastColumns.WIND_GUST,
-			AfPointDataForecastColumns.WIND_DIRECTION };
+			AfPointDataForecastColumns.WIND_DIRECTION,
+			AfPointDataForecastColumns.FEELS_LIKE,
+			AfPointDataForecastColumns.CLOUD_COVER };
 
 	/** Builds the INSERT statement so the number of "?" always matches the columns. */
 	static String buildPointDataInsertSql() {

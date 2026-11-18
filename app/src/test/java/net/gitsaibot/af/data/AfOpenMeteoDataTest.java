@@ -21,7 +21,9 @@ public class AfOpenMeteoDataTest {
 			+ "\"weather_code\":[3,61,null],"
 			+ "\"wind_speed_10m\":[18.0,22.5,25.1],"
 			+ "\"wind_gusts_10m\":[38.0,45.7,52.2],"
-			+ "\"wind_direction_10m\":[290,300,310]"
+			+ "\"wind_direction_10m\":[290,300,310],"
+			+ "\"apparent_temperature\":[4.2,3.9,null],"
+			+ "\"cloud_cover\":[20,85,100]"
 			+ "}}";
 
 	@Test
@@ -37,6 +39,9 @@ public class AfOpenMeteoDataTest {
 		assertEquals(25.1f, AfOpenMeteoData.get(r.hourly.windSpeed, 2), 0.001f);
 		assertNull(r.hourly.weatherCode.get(2));
 		assertNull(AfOpenMeteoData.get(r.hourly.windSpeed, 10));
+		assertEquals(4.2f, AfOpenMeteoData.get(r.hourly.apparentTemperature, 0), 0.001f);
+		assertNull(AfOpenMeteoData.get(r.hourly.apparentTemperature, 2));
+		assertEquals(85.0f, AfOpenMeteoData.get(r.hourly.cloudCover, 1), 0.001f);
 	}
 
 	@Test
