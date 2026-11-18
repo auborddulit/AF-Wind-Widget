@@ -325,8 +325,9 @@ public class AfProvider extends ContentProvider {
 	
 	private static class DatabaseHelper extends SQLiteOpenHelper {
 		private static final String DATABASE_NAME = "aix_database.db";
-		// AF Wind Widget: version 10 = wind columns, version 11 = feels-like and cloud cover
-		private static final int DATABASE_VERSION = 11;
+		// AF Wind Widget: version 10 = wind columns, version 11 = feels-like and cloud cover,
+		// version 12 = forces a new download so the new values are filled in
+		private static final int DATABASE_VERSION = 12;
 		// 0.1.6 = version 8
 		// 0.1.5 = version 7
 		// 0.1.4 = version 6
@@ -458,6 +459,14 @@ public class AfProvider extends ContentProvider {
 					db.execSQL("ALTER TABLE " + TABLE_AIXPOINTDATAFORECASTS
 							+ " ADD COLUMN " + AfPointDataForecastColumns.CLOUD_COVER + " REAL");
 				}
+
+				// Download the forecasts again at the next redraw, so that new columns get values
+				// instead of waiting for the next scheduled update (which can be hours away).
+				ContentValues refresh = new ContentValues();
+				refresh.put(AfLocationsColumns.LAST_FORECAST_UPDATE, 0);
+				refresh.put(AfLocationsColumns.FORECAST_VALID_TO, 0);
+				refresh.put(AfLocationsColumns.NEXT_FORECAST_UPDATE, 0);
+				db.update(TABLE_AIXLOCATIONS, refresh, null, null);
 				return;
 			}
 
